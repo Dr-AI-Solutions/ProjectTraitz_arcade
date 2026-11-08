@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROJECT TREITZ: Subterra Core Repair</title>
+    <title>Chronicles of Treitz: The Cursed Mucosa</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #030712;
-            color: #f3f4f6;
+            background-color: #05050d;
+            color: #f1f5f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
@@ -19,327 +19,288 @@
             user-select: none;
         }
 
-        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-
-        #game-wrapper {
+        #game-container {
             position: relative;
-            width: 900px;
+            width: 960px;
             max-width: 98vw;
-            background: #0f172a;
-            border: 2px solid #334155;
+            background: #090d16;
+            border: 3px solid #3b82f6;
             border-radius: 12px;
-            box-shadow: 0 0 40px rgba(14, 165, 233, 0.25);
+            box-shadow: 0 0 35px rgba(59, 130, 246, 0.35);
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* Top Bar */
+        /* Top HUD */
         .hud-top {
-            background: #090d16;
+            background: linear-gradient(180deg, #0f172a 0%, #090d16 100%);
             border-bottom: 2px solid #1e293b;
             padding: 8px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-family: monospace;
             font-size: 0.85rem;
+            z-index: 10;
         }
-        .core-badge {
+        .stat-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-weight: 900;
-            color: #38bdf8;
-            letter-spacing: 1px;
+            background: #020617;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid #1e293b;
         }
-        .pulse-light {
-            width: 10px; height: 10px; border-radius: 50%; background: #38bdf8;
-            box-shadow: 0 0 10px #38bdf8; animation: blink 0.8s infinite alternate;
-        }
-        @keyframes blink { from { opacity: 0.2; } to { opacity: 1; } }
 
         /* Canvas Arena */
-        #viewport-container {
+        #canvas-holder {
             position: relative;
             width: 100%;
-            height: 480px;
+            height: 500px;
             background: #020617;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
         canvas {
             display: block;
             background: #000;
         }
 
-        /* Bottom Controls */
-        .hud-bottom {
+        /* Bottom Spell Bar */
+        .spell-bar {
             background: #090d16;
             border-top: 2px solid #1e293b;
-            padding: 10px 14px;
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 12px;
+            padding: 8px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: monospace;
+            font-size: 0.78rem;
         }
-
-        .action-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+        .spells-list {
+            display: flex;
+            gap: 8px;
         }
-
-        .btn-core {
+        .spell-card {
             background: #1e293b;
-            border: 1px solid #334155;
-            color: #e2e8f0;
-            padding: 8px 6px;
-            border-radius: 6px;
-            font-size: 0.72rem;
-            font-weight: bold;
+            border: 2px solid #334155;
+            padding: 6px 12px;
+            border-radius: 8px;
             cursor: pointer;
-            text-align: left;
             transition: all 0.15s;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
         }
-        .btn-core:hover {
-            background: #334155;
-            border-color: #64748b;
-            transform: translateY(-1px);
+        .spell-card:hover {
+            border-color: #60a5fa;
+            transform: translateY(-2px);
         }
-        .btn-core:active { transform: translateY(1px); }
-        .btn-core span { font-size: 0.62rem; color: #94a3b8; font-weight: normal; }
-        .btn-core kbd {
-            align-self: flex-end;
+        .spell-active {
+            background: #1e3a8a !important;
+            border-color: #38bdf8 !important;
+            box-shadow: 0 0 12px #38bdf8;
+        }
+        .spell-key {
             background: #020617;
             border: 1px solid #475569;
-            padding: 1px 4px;
-            border-radius: 3px;
-            font-size: 0.6rem;
-            color: #38bdf8;
-        }
-
-        /* Module Diagnostics */
-        .diag-box {
-            background: #020617;
-            border: 1px solid #1e293b;
-            border-radius: 6px;
-            padding: 6px 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            padding: 2px 6px;
+            border-radius: 4px;
             font-size: 0.7rem;
+            color: #38bdf8;
+            font-weight: bold;
         }
-        .diag-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 3px;
-        }
-        .val-good { color: #34d399; font-weight: bold; }
-        .val-warn { color: #fbbf24; font-weight: bold; }
-        .val-bad { color: #f87171; font-weight: bold; }
 
-        /* Overlay Messages */
-        .screen-overlay {
+        /* Screens */
+        .overlay-screen {
             position: absolute;
             inset: 0;
-            background: rgba(2, 6, 23, 0.92);
+            background: rgba(2, 6, 23, 0.94);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
-            z-index: 20;
+            z-index: 30;
         }
         .hidden { display: none !important; }
 
-        .btn-start {
+        .btn-play {
             margin-top: 18px;
-            background: #0284c7;
+            background: #2563eb;
             color: white;
             font-weight: 900;
-            padding: 10px 24px;
-            border: 1px solid #38bdf8;
+            padding: 12px 30px;
+            border: 2px solid #60a5fa;
             border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
-            font-size: 0.95rem;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
             transition: all 0.2s;
         }
-        .btn-start:hover {
-            background: #0369a1;
-            box-shadow: 0 0 25px rgba(56, 189, 248, 0.7);
+        .btn-play:hover {
+            background: #1d4ed8;
+            transform: scale(1.04);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
         }
     </style>
 </head>
 <body>
 
-    <div id="game-wrapper" class="mono">
-        <!-- HUD Header -->
+    <div id="game-container">
+        <!-- Barra Superior de Parámetros -->
         <div class="hud-top">
-            <div class="core-badge">
-                <div class="pulse-light" id="core-light"></div>
-                PROJECT TREITZ // CORE MONITOR
+            <div style="font-weight: 900; color: #60a5fa; letter-spacing: 1px;">
+                CHRONICLES OF TREITZ <span style="color: #ef4444;">⚔️ ACTION PLATFORMER</span>
             </div>
-            <div style="display: flex; gap: 16px; font-size: 0.8rem;">
-                <div>NIVEL: <span id="level-display" style="color: #fbbf24; font-weight: bold;">SECTOR 1</span></div>
-                <div>INTEGRIDAD: <span id="integrity-display" class="val-good">100%</span></div>
-                <div>TIEMPO SOBREVIVENCIA: <span id="time-display" style="color: #38bdf8;">00:00</span></div>
-            </div>
-        </div>
-
-        <!-- Canvas Principal -->
-        <div id="viewport-container">
-            <canvas id="coreCanvas" width="900" height="480"></canvas>
-
-            <!-- Pantalla Inicio -->
-            <div id="start-screen" class="screen-overlay">
-                <h1 style="color: #38bdf8; font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 8px;">SUBTERRA CORE: PROTOCOLO TREITZ</h1>
-                <p style="max-width: 650px; font-size: 0.82rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 12px; font-family: sans-serif;">
-                    Eres el ingeniero de soporte en una estación sumergida. Una falla hidráulica de alta energía ha fracturado las tuberías aguas arriba de la <strong>Válvula Treitz</strong>.<br><br>
-                    Para evitar la implosión del submarino, debes navegar con tu robot de mantenimiento (<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> o Flechas) y sellar las fisuras disparando herramientas con <kbd>CLIC</kbd>.<br>
-                    Simultáneamente, deberás modular las presiones de la central mediante comandos de consola (<kbd>1</kbd> a <kbd>6</kbd>).
-                </p>
-                <div style="background: #020617; border: 1px solid #1e293b; padding: 10px; border-radius: 8px; font-size: 0.75rem; text-align: left; max-width: 600px;">
-                    <div style="color: #fbbf24; font-weight: bold; margin-bottom: 4px;">REGLAS CRÍTICAS DE FÍSICA HIDRÁULICA:</div>
-                    • Si el pH del refrigerante es ácido (&lt;6.0), la mezcla disolverá cualquier parche mecánico.<br>
-                    • No sobrecargues la batería (&gt;80%): el aumento masivo de presión en la red reventará los sellos débiles.<br>
-                    • Identifica el tipo de falla: no inyectes criospray en colectores de alta tensión portal o causará detonación.
+            <div style="display: flex; gap: 10px;">
+                <div class="stat-badge">
+                    <span style="color: #94a3b8;">VIDA (Hb):</span>
+                    <strong id="hud-hp" style="color: #34d399;">100%</strong>
                 </div>
-                <button class="btn-start" onclick="startGame()">INICIAR PROTOCOLO DE REPARACIÓN</button>
-            </div>
-
-            <!-- Pantalla Fin de Partida / Retroalimentación -->
-            <div id="gameover-screen" class="screen-overlay hidden">
-                <h2 id="over-title" style="color: #f87171; font-size: 1.6rem; margin-bottom: 8px;">FALLA CATASTRÓFICA DEL NÚCLEO</h2>
-                <div id="over-reason" style="font-size: 0.85rem; color: #cbd5e1; max-width: 600px; line-height: 1.5; font-family: sans-serif; margin-bottom: 15px;"></div>
-                <div id="over-debrief" style="background: #020617; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; font-size: 0.74rem; text-align: left; max-width: 620px; color: #94a3b8; font-family: sans-serif;"></div>
-                <button class="btn-start" onclick="restartGame()">REINTENTAR SIMULACIÓN</button>
+                <div class="stat-badge">
+                    <span style="color: #94a3b8;">PRESIÓN (PAM):</span>
+                    <strong id="hud-pam" style="color: #fbbf24;">75 PSI</strong>
+                </div>
+                <div class="stat-badge">
+                    <span style="color: #94a3b8;">AURA pH:</span>
+                    <strong id="hud-ph" style="color: #f87171;">2.0 (Ácido)</strong>
+                </div>
             </div>
         </div>
 
-        <!-- Consola de Control de Sistemas (Acciones) -->
-        <div class="hud-bottom">
-            <div class="action-grid">
-                <!-- 1: Ventilador de Emergencia -->
-                <button class="btn-core" onclick="triggerSystem(1)">
-                    <div>PURGA DE FLUJO<br><span>Evita inundación de turbina</span></div>
-                    <kbd>[1]</kbd>
-                </button>
-                <!-- 2: Despresurizador / Cristaloides -->
-                <button class="btn-core" onclick="triggerSystem(2)">
-                    <div>INYECCIÓN FLUIDO AUX<br><span>Subir presión si cae de 65 PSI</span></div>
-                    <kbd>[2]</kbd>
-                </button>
-                <!-- 3: Batería / Transfusión -->
-                <button class="btn-core" onclick="triggerSystem(3)">
-                    <div>RECARGA DE CELDAS<br><span>Meta restrictiva: 70-80%</span></div>
-                    <kbd>[3]</kbd>
-                </button>
-                <!-- 4: Neutralizador Alcalino -->
-                <button class="btn-core" onclick="triggerSystem(4)">
-                    <div>NEUTRALIZADOR ALCALINO<br><span>Elevar pH del refrigerante &gt;6.0</span></div>
-                    <kbd>[4]</kbd>
-                </button>
-                <!-- 5: Reductor de Colector Auxiliar -->
-                <button class="btn-core" onclick="triggerSystem(5)">
-                    <div>VALVULA BYPASS COLECTOR<br><span>Frena fuga en colector portal</span></div>
-                    <kbd>[5]</kbd>
-                </button>
-                <!-- 6: Taponamiento Balón -->
-                <button class="btn-core" onclick="triggerSystem(6)">
-                    <div>SELLO NEUMÁTICO GLOBAL<br><span>Bloqueo temporal de emergencia</span></div>
-                    <kbd>[6]</kbd>
-                </button>
+        <!-- Lienzo de Juego 2D -->
+        <div id="canvas-holder">
+            <canvas id="gameCanvas" width="960" height="500"></canvas>
+
+            <!-- Pantalla de Inicio -->
+            <div id="start-screen" class="overlay-screen">
+                <h1 style="color: #60a5fa; font-size: 2rem; margin-bottom: 6px; letter-spacing: 2px;">EL HECHICERO DE TREITZ</h1>
+                <div style="font-size: 0.95rem; color: #cbd5e1; margin-bottom: 16px;">¡Supera las plataformas, esquiva el ácido y derrota a los 2 Titanes de la Sangre!</div>
+
+                <div style="background: #090d16; border: 1px solid #1e293b; padding: 14px 20px; border-radius: 10px; max-width: 650px; text-align: left; font-size: 0.8rem; line-height: 1.6;">
+                    <strong style="color: #fbbf24;">CONTROLES DE ACCIÓN REAL:</strong><br>
+                    • <kbd>A</kbd> / <kbd>D</kbd> o Flechas: <strong>Moverse</strong><br>
+                    • <kbd>W</kbd>, <kbd>Espacio</kbd> o Flecha Arriba: <strong>Saltar plataformas</strong><br>
+                    • <kbd>CLIC IZQUIERDO</kbd>: <strong>Lanzar Hechizo con la Varita hacia el cursor</strong><br>
+                    • <kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>, <kbd>4</kbd> o Clic en la barra: <strong>Cambiar Hechizo activo</strong><br><br>
+                    <strong style="color: #38bdf8;">REGLAS SECRETAS DE FISIOPATOLOGÍA CLÍNICA:</strong><br>
+                    1. <strong>Titán Úlcera (Rojo fuego):</strong> Si el pH de la cueva es ácido (&lt;6.0), tu Grapa se derrite al instante. ¡Debes neutralizar con el hechizo <kbd>[1]</kbd> (Omeprazol), congelar su chorro con <kbd>[2]</kbd> (Adrenalina) y clavarle la Grapa <kbd>[3]</kbd> (Endoclip)!<br>
+                    2. <strong>Titán Várice (Gólem Púrpura):</strong> Si le disparas Adrenalina o Grapas, ¡la pared venosa estalla y te mata! Debes activar la Runa de Descompresión <kbd>[4]</kbd> (Terlipresina) y luego capturarlo con el Anillo Elástico <kbd>[2]</kbd> (Banda).
+                </div>
+
+                <button class="btn-play" onclick="startGame()">¡COMENZAR AVENTURA!</button>
             </div>
 
-            <!-- Panel de Telemetría (Parámetros Fisiopatológicos Cifrados) -->
-            <div class="diag-box">
-                <div style="font-weight: bold; color: #94a3b8; border-bottom: 1px solid #1e293b; padding-bottom: 3px; margin-bottom: 4px; font-size: 0.65rem;">
-                    TELEMETRÍA HIDRÁULICA Y FÍSICO-QUÍMICA
+            <!-- Pantalla Fin de Partida -->
+            <div id="gameover-screen" class="overlay-screen hidden">
+                <h2 id="over-title" style="color: #ef4444; font-size: 2rem; margin-bottom: 8px;">CAÍDA DEL HÉROE</h2>
+                <div id="over-reason" style="font-size: 0.95rem; color: #e2e8f0; max-width: 600px; line-height: 1.5; margin-bottom: 14px;"></div>
+                <div id="over-feedback" style="background: #020617; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; font-size: 0.8rem; text-align: left; max-width: 620px; color: #94a3b8; font-family: sans-serif;"></div>
+                <button class="btn-play" onclick="startGame()">REINTENTAR NIVEL</button>
+            </div>
+        </div>
+
+        <!-- Barra Inferior de Hechizos -->
+        <div class="spell-bar">
+            <div style="color: #94a3b8;">LIBRO DE HECHIZOS:</div>
+            <div class="spells-list">
+                <!-- 1: Alcalium / IBP -->
+                <div class="spell-card" id="card-spell-1" onclick="selectSpell(1)">
+                    <span class="spell-key">[1]</span>
+                    <div><strong>ALCALIUM</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Sube pH &gt;6.0 (Omeprazol)</span></div>
                 </div>
-                <div class="diag-row">
-                    <span>Presión Hidráulica Central:</span>
-                    <span id="tel-pressure" class="val-warn">58 PSI [Meta ≥65]</span>
+                <!-- 2: Crio / Adrenalina -->
+                <div class="spell-card" id="card-spell-2" onclick="selectSpell(2)">
+                    <span class="spell-key">[2]</span>
+                    <div><strong>GLACIUS JET</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Congela Chorro Úlcera</span></div>
                 </div>
-                <div class="diag-row">
-                    <span>Celdas de Potencia (Energía):</span>
-                    <span id="tel-battery" class="val-bad">62% [Meta 70-80%]</span>
+                <!-- 3: Endoclip / Grapa -->
+                <div class="spell-card spell-active" id="card-spell-3" onclick="selectSpell(3)">
+                    <span class="spell-key">[3]</span>
+                    <div><strong>GRAPA TITANIO</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Sello Mecánico Úlcera</span></div>
                 </div>
-                <div class="diag-row">
-                    <span>pH Solución Refrigerante:</span>
-                    <span id="tel-ph" class="val-bad">2.2 [Ácido corrosivo]</span>
+                <!-- 4: Banda / Anillo de Compresión -->
+                <div class="spell-card" id="card-spell-4" onclick="selectSpell(4)">
+                    <span class="spell-key">[4]</span>
+                    <div><strong>ANILLO ESTRANGULADOR</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Liga la Várice Portal</span></div>
                 </div>
-                <div class="diag-row">
-                    <span>Nivel Inundación Cámara:</span>
-                    <span id="tel-flood" class="val-good">35%</span>
-                </div>
-                <div class="diag-row">
-                    <span>Ducto Aire / Turbina:</span>
-                    <span id="tel-turbine" class="val-good">DESPEJADO</span>
+                <!-- 5: Terlipresina Runa -->
+                <div class="spell-card" id="card-spell-5" onclick="selectSpell(5)">
+                    <span class="spell-key">[5]</span>
+                    <div><strong>RUNA BYPASS</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Frena Flujo V1 (Terlipresina)</span></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('coreCanvas');
+        const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Estado del Juego
         let isRunning = false;
-        let gameTime = 0;
-        let gameLoopId = null;
+        let animationId = null;
 
-        // Fisiopatología Mecanizada en Sistemas
-        const coreState = {
-            pressure: 56,        // Presión hidrostática / PAM (Meta: 65 - 80)
-            battery: 64,         // Hemoglobina (%) - Meta restrictiva: 70 - 80%
-            ph: 2.2,             // pH gástrico (debe ser > 6.0 para que pegue el sello)
-            flooding: 30,        // Nivel de líquido en cámara (Stomach Blood)
-            turbineProtected: false, // Intubación / Vía aérea
-            bypassActive: false, // Terlipresina (frena fuga en colector portal)
-            bypassTimer: 0,
-            pneumaticSeal: false,// Balón de Sengstaken
-            integrity: 100
+        // Fisiopatología Oculta
+        const bioState = {
+            hp: 100,             // Hemoglobina / Vida del Héroe
+            pam: 75,            // Presión de perfusión
+            ph: 2.1,            // pH de la cueva (Ácido corrosivo)
+            bypassActive: false, // Terlipresina
+            bypassTime: 0
         };
 
-        // Entidad Jugador: Drone de Mantenimiento
-        const drone = {
-            x: 450,
-            y: 380,
+        // Hechizo Seleccionado (1 a 5)
+        let activeSpell = 3; // Por defecto: Grapa de Titanio
+
+        // Héroe (Super Mario / Harry Potter)
+        const hero = {
+            x: 100,
+            y: 350,
+            width: 28,
+            height: 44,
             vx: 0,
             vy: 0,
-            speed: 4.5,
-            radius: 14,
-            currentTool: 'grapa', // 'crio' (adrenalina), 'grapa' (endoclip), 'anillo' (bandas)
+            speed: 5.2,
+            jumpPower: -12.5,
+            grounded: false,
+            facingRight: true,
             aimAngle: 0
         };
 
-        // Proyectiles / Herramientas disparadas
-        let toolProjectiles = [];
+        const GRAVITY = 0.6;
+        let cameraX = 0;
 
-        // Fisuras en tuberías (Focos de Sangrado)
-        // Tipo 'erosion' = Úlcera (requiere crio + grapa)
-        // Tipo 'colector' = Várice de alta presión (requiere bypass + anillo)
-        let fissures = [];
+        // Plataformas del Nivel
+        let platforms = [];
+        // Monstruos / Titanes
+        let bosses = [];
+        // Esbirros de Pepsina (Ácido)
+        let minions = [];
+        // Proyectiles del Héroe
+        let spells = [];
+        // Efectos visuales y textos flotantes
+        let fxParticles = [];
+        let floatTexts = [];
 
-        // Partículas de fuga
-        let jetParticles = [];
-
-        // Teclado
+        // Controles de Teclado
         const keys = {};
 
         window.addEventListener('keydown', e => {
             keys[e.key.toLowerCase()] = true;
-            if (e.key >= '1' && e.key <= '6') {
-                triggerSystem(parseInt(e.key));
+            if (e.key >= '1' && e.key <= '5') {
+                selectSpell(parseInt(e.key));
             }
-            if (e.key.toLowerCase() === 'q') cycleTool();
+            if ((e.key === ' ' || e.key.toLowerCase() === 'w' || e.key === 'ArrowUp') && hero.grounded) {
+                hero.vy = hero.jumpPower;
+                hero.grounded = false;
+                spawnParticles(hero.x + hero.width/2, hero.y + hero.height, '#64748b', 6);
+            }
         });
 
         window.addEventListener('keyup', e => {
@@ -348,504 +309,627 @@
 
         canvas.addEventListener('mousemove', e => {
             const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
+            const mouseX = e.clientX - rect.left + cameraX;
             const mouseY = e.clientY - rect.top;
-            drone.aimAngle = Math.atan2(mouseY - drone.y, mouseX - drone.x);
+            hero.aimAngle = Math.atan2(mouseY - (hero.y + 16), mouseX - (hero.x + 14));
+            hero.facingRight = mouseX >= (hero.x + 14);
         });
 
         canvas.addEventListener('mousedown', e => {
             if (!isRunning) return;
-            fireTool();
+            castSpell();
         });
 
-        function cycleTool() {
-            const tools = ['grapa', 'crio', 'anillo'];
-            let nextIdx = (tools.indexOf(drone.currentTool) + 1) % tools.length;
-            drone.currentTool = tools[nextIdx];
+        function selectSpell(id) {
+            activeSpell = id;
+            for (let i = 1; i <= 5; i++) {
+                const card = document.getElementById(`card-spell-${i}`);
+                if (card) {
+                    if (i === id) card.classList.add('spell-active');
+                    else card.classList.remove('spell-active');
+                }
+            }
+
+            // Hechizos de activación directa sin proyectil:
+            if (id === 1) { // Alcalium / Omeprazol
+                bioState.ph = 6.8;
+                spawnFloatText(hero.x, hero.y - 30, "¡AURA ALCALINA! pH neutralizado a 6.8 (Inhibe corrosión)", "#fde047");
+                spawnParticles(hero.x + 14, hero.y + 20, "#fde047", 25);
+            } else if (id === 5) { // Runa Bypass / Terlipresina
+                bioState.bypassActive = true;
+                bioState.bypassTime = 400; // ~6.5 segundos
+                spawnFloatText(hero.x, hero.y - 30, "¡RUNA BYPASS ACTIVADA! Flujo venoso portal reducido al 40%", "#c084fc");
+                spawnParticles(hero.x + 14, hero.y + 20, "#c084fc", 25);
+            }
         }
 
-        function fireTool() {
-            const speed = 9;
-            toolProjectiles.push({
-                x: drone.x,
-                y: drone.y,
-                vx: Math.cos(drone.aimAngle) * speed,
-                vy: Math.sin(drone.aimAngle) * speed,
-                type: drone.currentTool,
-                life: 60
+        function castSpell() {
+            // Si el hechizo es de proyectil (2: Glacius, 3: Grapa, 4: Anillo)
+            if (activeSpell === 1 || activeSpell === 5) return;
+
+            const speed = 12;
+            const originX = hero.x + (hero.facingRight ? hero.width + 4 : -4);
+            const originY = hero.y + 18;
+
+            spells.push({
+                x: originX,
+                y: originY,
+                vx: Math.cos(hero.aimAngle) * speed,
+                vy: Math.sin(hero.aimAngle) * speed,
+                type: activeSpell,
+                life: 75
             });
+
+            spawnParticles(originX, originY, activeSpell === 2 ? '#38bdf8' : (activeSpell === 3 ? '#eab308' : '#f97316'), 8);
         }
 
-        function spawnFissures() {
-            fissures = [
+        function buildLevel() {
+            // Plataformas fijas y obstáculos
+            platforms = [
+                // Suelo base principal
+                { x: 0, y: 440, w: 2400, h: 60 },
+
+                // Plataformas flotantes sector 1 (Hacia el Titán Úlcera)
+                { x: 260, y: 350, w: 120, h: 20 },
+                { x: 440, y: 280, w: 140, h: 20 },
+                { x: 640, y: 220, w: 160, h: 20 },
+                { x: 860, y: 320, w: 200, h: 20 },
+
+                // Sector 2 (Hacia el Titán Várice)
+                { x: 1200, y: 340, w: 140, h: 20 },
+                { x: 1420, y: 260, w: 160, h: 20 },
+                { x: 1660, y: 190, w: 150, h: 20 },
+                { x: 1880, y: 310, w: 260, h: 20 },
+
+                // Pared límite final
+                { x: 2360, y: 0, w: 40, h: 500 }
+            ];
+
+            // 2 Titanes de la Sangre (Jefes de Acción)
+            bosses = [
                 {
-                    id: 1,
-                    x: 240,
-                    y: 140,
-                    type: 'erosion', // Equivalente a Úlcera Péptica
-                    label: "FISURA EROSIVA ALPHA",
-                    crioApplied: false,
-                    sealed: false,
-                    flowRate: 0.05
+                    id: 'ulcer',
+                    name: "TITÁN DE LA ROCA SANGRANTE (Úlcera Forrest Ia)",
+                    x: 920,
+                    y: 240,
+                    w: 70,
+                    h: 80,
+                    hp: 100,
+                    type: 'ulcer',
+                    frozen: false,
+                    frozenTimer: 0,
+                    defeated: false,
+                    attackTimer: 0
                 },
                 {
-                    id: 2,
-                    x: 660,
-                    y: 140,
-                    type: 'colector', // Equivalente a Rotura de Várices
-                    label: "COLECTOR HIPERPRESURIZADO",
-                    ringApplied: false,
-                    sealed: false,
-                    flowRate: 0.07
+                    id: 'varice',
+                    name: "HIDRA DEL COLECTOR PORTAL (Várice Esofágica)",
+                    x: 1980,
+                    y: 220,
+                    w: 80,
+                    h: 90,
+                    hp: 100,
+                    type: 'varice',
+                    banded: false,
+                    defeated: false,
+                    attackTimer: 0
                 }
+            ];
+
+            // Esbirros de Ácido Pepsina que patrullan
+            minions = [
+                { x: 380, y: 410, w: 28, h: 28, vx: 1.8, minX: 300, maxX: 580 },
+                { x: 1300, y: 410, w: 28, h: 28, vx: -2.0, minX: 1200, maxX: 1550 },
+                { x: 1720, y: 410, w: 28, h: 28, vx: 2.2, minX: 1600, maxX: 1850 }
             ];
         }
 
         function startGame() {
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('gameover-screen').classList.add('hidden');
+
+            hero.x = 80;
+            hero.y = 360;
+            hero.vx = 0;
+            hero.vy = 0;
+            cameraX = 0;
+
+            bioState.hp = 100;
+            bioState.pam = 75;
+            bioState.ph = 2.1;
+            bioState.bypassActive = false;
+
+            spells = [];
+            fxParticles = [];
+            floatTexts = [];
+
+            buildLevel();
+            selectSpell(3);
+
             isRunning = true;
-            gameTime = 0;
-            coreState.pressure = 56;
-            coreState.battery = 63;
-            coreState.ph = 2.2;
-            coreState.flooding = 30;
-            coreState.turbineProtected = false;
-            coreState.bypassActive = false;
-            coreState.pneumaticSeal = false;
-            coreState.integrity = 100;
-            toolProjectiles = [];
-            jetParticles = [];
-            spawnFissures();
-
-            if (gameLoopId) clearInterval(gameLoopId);
-            gameLoopId = setInterval(gameTick, 1000 / 60);
+            if (animationId) cancelAnimationFrame(animationId);
+            gameLoop();
         }
 
-        function restartGame() {
-            startGame();
-        }
-
-        // Acciones de Consola Central (Modulación Fisiopatológica)
-        function triggerSystem(num) {
+        function gameLoop() {
             if (!isRunning) return;
+            update();
+            render();
+            animationId = requestAnimationFrame(gameLoop);
+        }
 
-            switch(num) {
-                case 1: // Purga de Turbina (Asegurar Vía Aérea / IOT)
-                    coreState.turbineProtected = true;
-                    coreState.pressure = Math.max(40, coreState.pressure - 4); // Leve hipotensión pos-inducción
-                    createFloatingText("¡DUCTO HERMÉTICO SELLADO! Turbina protegida contra inundación", "#38bdf8");
-                    break;
-
-                case 2: // Inyección Auxiliar (Cristaloides - Titulación PAM)
-                    if (coreState.pressure < 65) {
-                        coreState.pressure += 9;
-                        createFloatingText("Presión restaurada (+9 PSI)", "#34d399");
-                    } else {
-                        // Penalización por hemodilución / aumento indebido de volumen
-                        coreState.battery -= 4;
-                        coreState.flooding += 6;
-                        createFloatingText("¡ALERTA!: Exceso de fluido hidráulico generó hemodilución", "#f87171");
-                    }
-                    break;
-
-                case 3: // Celdas de Potencia (Transfusión Restrictiva)
-                    // Fisiopatología de Villanueva: Solo transfundir si batería < 70%
-                    if (coreState.battery < 70) {
-                        coreState.battery += 8;
-                        createFloatingText("Celdas recargadas (+8% Energía)", "#38bdf8");
-                    } else {
-                        // Sobretransfusión: aumento de presión portal y fuga
-                        coreState.battery += 8;
-                        coreState.pressure += 6;
-                        fissures.forEach(f => { if (!f.sealed) f.flowRate *= 1.4; });
-                        createFloatingText("¡IATROGENIA!: Batería >80% incrementó la presión en las fisuras", "#f87171");
-                    }
-                    break;
-
-                case 4: // Neutralizador Alcalino (IBP en Bolo - Omeprazol)
-                    coreState.ph = 6.6;
-                    createFloatingText("pH neutralizado a 6.6 (Inhibición de corrosión ácida)", "#fde047");
-                    break;
-
-                case 5: // Válvula Bypass (Terlipresina)
-                    coreState.bypassActive = true;
-                    coreState.bypassTimer = 300; // 5 segundos de alivio
-                    createFloatingText("Bypass activado: Flujo en Colector reducido al 40%", "#c084fc");
-                    break;
-
-                case 6: // Sello Neumático (Sonda de Sengstaken)
-                    if (!coreState.turbineProtected) {
-                        endGame(false, "ASFIXIA DE TURBINA", "Intentaste desplegar el sello neumático sin proteger el ducto de aire de la turbina. El reflujo anegó el respirador.");
-                        return;
-                    }
-                    coreState.pneumaticSeal = true;
-                    fissures.forEach(f => { if (f.type === 'colector') f.sealed = true; });
-                    createFloatingText("¡SELLADO NEUMÁTICO GLOBAL DE EMERGENCIA!", "#38bdf8");
-                    break;
+        function update() {
+            // 1. Movimiento horizontal del Héroe
+            if (keys['a'] || keys['arrowleft']) {
+                hero.vx = -hero.speed;
+                hero.facingRight = false;
+            } else if (keys['d'] || keys['arrowright']) {
+                hero.vx = hero.speed;
+                hero.facingRight = true;
+            } else {
+                hero.vx *= 0.75;
             }
-        }
 
-        let floatingTexts = [];
-        function createFloatingText(txt, color) {
-            floatingTexts.push({
-                text: txt,
-                color: color,
-                x: 450,
-                y: 240,
-                alpha: 1.0,
-                life: 80
-            });
-        }
+            // Gravedad
+            hero.vy += GRAVITY;
+            hero.x += hero.vx;
+            hero.y += hero.vy;
 
-        // Bucle Principal (Tick)
-        function gameTick() {
-            gameTime++;
-
-            // Movimiento del Drone
-            if (keys['w'] || keys['arrowup']) drone.vy -= 0.5;
-            if (keys['s'] || keys['arrowdown']) drone.vy += 0.5;
-            if (keys['a'] || keys['arrowleft']) drone.vx -= 0.5;
-            if (keys['d'] || keys['arrowright']) drone.vx += 0.5;
-
-            drone.vx *= 0.88;
-            drone.vy *= 0.88;
-            drone.x += drone.vx;
-            drone.y += drone.vy;
-
-            // Límites del canvas
-            drone.x = Math.max(30, Math.min(canvas.width - 30, drone.x));
-            drone.y = Math.max(80, Math.min(canvas.height - 30, drone.y));
-
-            // Actualización de Fisiopatología
-            let activeBleedRate = 0;
-            fissures.forEach(f => {
-                if (!f.sealed) {
-                    let multiplier = 1.0;
-                    if (f.type === 'colector' && coreState.bypassActive) multiplier = 0.4;
-                    if (f.type === 'erosion' && f.crioApplied) multiplier = 0.5;
-                    activeBleedRate += f.flowRate * multiplier;
-
-                    // Emitir partículas de fuga
-                    if (Math.random() < 0.6) {
-                        jetParticles.push({
-                            x: f.x,
-                            y: f.y + 10,
-                            vx: (Math.random() - 0.5) * 3,
-                            vy: Math.random() * 4 + 2,
-                            life: 40,
-                            color: f.type === 'colector' ? '#991b1b' : '#ef4444'
-                        });
+            // Colisiones con Plataformas (AABB)
+            hero.grounded = false;
+            platforms.forEach(p => {
+                // Chequeo de colisión vertical (aterrizaje)
+                if (hero.x + hero.width > p.x && hero.x < p.x + p.w) {
+                    if (hero.y + hero.height >= p.y && hero.y + hero.height <= p.y + p.h + hero.vy && hero.vy >= 0) {
+                        hero.y = p.y - hero.height;
+                        hero.vy = 0;
+                        hero.grounded = true;
                     }
                 }
             });
 
-            // Caída de Energía y Presión por la Fuga
-            if (activeBleedRate > 0) {
-                coreState.battery -= activeBleedRate * 0.12;
-                coreState.pressure -= activeBleedRate * 0.15;
-                coreState.flooding += activeBleedRate * 0.22;
-            } else {
-                coreState.flooding = Math.max(5, coreState.flooding - 0.08);
+            // Límites del mundo
+            if (hero.x < 10) hero.x = 10;
+            if (hero.y > 480) { // Caída al vacío ácido
+                heroTakeDamage(25, "¡CAÍSTE AL LAGO DE ÁCIDO GASTRICO!");
+                hero.y = 350;
+                hero.x = Math.max(50, hero.x - 120);
             }
 
-            // Temporizador del Bypass portal
-            if (coreState.bypassActive) {
-                coreState.bypassTimer--;
-                if (coreState.bypassTimer <= 0) coreState.bypassActive = false;
+            // Cámara sigue al jugador (centrada horizontalmente)
+            cameraX = Math.max(0, Math.min(hero.x - 400, 1440));
+
+            // Fisiopatología: Efecto del Bypass (Terlipresina)
+            if (bioState.bypassActive) {
+                bioState.bypassTime--;
+                if (bioState.bypassTime <= 0) {
+                    bioState.bypassActive = false;
+                    spawnFloatText(hero.x, hero.y - 20, "Fin del efecto Terlipresina", "#94a3b8");
+                }
             }
 
-            // Amenaza Crítica: Inundación sin Protección de Turbina
-            if (coreState.flooding >= 85 && !coreState.turbineProtected) {
-                endGame(false, "AHOGAMIENTO DEL NÚCLEO (BRONCOASPIRACIÓN)", 
-                    "La inundación en la cámara superó el umbral de seguridad y el líquido penetró en la turbina de aire sin ducto hermético.");
+            // Caída progresiva de vida por sangrado de Titanes no derrotados
+            let activeBleed = 0;
+            bosses.forEach(b => {
+                if (!b.defeated) {
+                    let rate = (b.type === 'varice' && bioState.bypassActive) ? 0.02 : 0.05;
+                    activeBleed += rate;
+                }
+            });
+            bioState.hp = Math.max(0, +(bioState.hp - activeBleed).toFixed(2));
+            if (bioState.hp <= 0) {
+                endGame(false, "SHOCK HIPOVOLÉMICO FATAL", "El sangrado masivo no contenido agotó la hemoglobina y reserva del héroe.");
                 return;
             }
 
-            // Colapso Hidráulico
-            if (coreState.pressure < 38 || coreState.battery < 30) {
-                endGame(false, "COLAPSO TISULAR / APAGÓN DEL REACTOR", 
-                    "La presión hidráulica descendió de los niveles críticos de perfusión o las celdas de potencia se vaciaron por completo.");
-                return;
-            }
+            // 2. Comportamiento de Esbirros de Pepsina
+            minions.forEach(m => {
+                m.x += m.vx;
+                if (m.x < m.minX || m.x > m.maxX) m.vx *= -1;
 
-            // Proyectiles
-            for (let i = toolProjectiles.length - 1; i >= 0; i--) {
-                let p = toolProjectiles[i];
+                // Colisión con Héroe
+                if (checkOverlap(hero, m)) {
+                    heroTakeDamage(12, "¡QUEMADURA DE PEPSINA CORROSIVA!");
+                    hero.vx = m.vx * 3;
+                    hero.vy = -6;
+                }
+            });
+
+            // 3. Comportamiento de los Titanes (Jefes)
+            bosses.forEach(b => {
+                if (b.defeated) return;
+
+                b.attackTimer++;
+
+                // El Titán Úlcera dispara chorros de lava/sangre a presión
+                if (b.type === 'ulcer' && !b.frozen) {
+                    if (b.attackTimer % 90 === 0) {
+                        spawnParticles(b.x + 35, b.y + 20, '#ef4444', 16);
+                        // Si el héroe está cerca, le causa daño por hematemesis activa
+                        if (Math.hypot((hero.x + 14) - (b.x + 35), (hero.y + 20) - (b.y + 40)) < 260) {
+                            heroTakeDamage(8, "¡GOLPE DE CHORRO ARTERIAL A PRESIÓN!");
+                        }
+                    }
+                }
+
+                // El Titán Várice pulsa violentamente si no tiene bypass
+                if (b.type === 'varice') {
+                    if (b.attackTimer % 80 === 0 && !bioState.bypassActive) {
+                        spawnParticles(b.x + 40, b.y + 30, '#991b1b', 14);
+                        if (Math.hypot((hero.x + 14) - (b.x + 40), (hero.y + 20) - (b.y + 45)) < 240) {
+                            heroTakeDamage(10, "¡ONDA DE CHOQUE POR HIPERTENSIÓN PORTAL!");
+                        }
+                    }
+                }
+
+                if (b.frozen) {
+                    b.frozenTimer--;
+                    if (b.frozenTimer <= 0) b.frozen = false;
+                }
+            });
+
+            // 4. Proyectiles del Héroe
+            for (let i = spells.length - 1; i >= 0; i--) {
+                let p = spells[i];
                 p.x += p.vx;
                 p.y += p.vy;
                 p.life--;
 
-                // Colisión con fisuras
-                fissures.forEach(f => {
-                    if (!f.sealed) {
-                        let dist = Math.hypot(p.x - f.x, p.y - f.y);
-                        if (dist < 35) {
-                            handleFissureInteraction(f, p.type);
-                            p.life = 0;
-                        }
+                // Impacto con esbirros de pepsina
+                minions.forEach((m, mIdx) => {
+                    if (p.x > m.x && p.x < m.x + m.w && p.y > m.y && p.y < m.y + m.h) {
+                        spawnParticles(m.x + m.w/2, m.y + m.h/2, '#10b981', 15);
+                        spawnFloatText(m.x, m.y - 15, "¡ESBIRRO ELIMINADO!", "#34d399");
+                        minions.splice(mIdx, 1);
+                        p.life = 0;
                     }
                 });
 
-                if (p.life <= 0) toolProjectiles.splice(i, 1);
+                // Impacto con Titanes
+                bosses.forEach(b => {
+                    if (!b.defeated && p.x > b.x && p.x < b.x + b.w && p.y > b.y && p.y < b.y + b.h) {
+                        handleBossSpellHit(b, p.type);
+                        p.life = 0;
+                    }
+                });
+
+                if (p.life <= 0) spells.splice(i, 1);
             }
 
-            // Partículas
-            for (let i = jetParticles.length - 1; i >= 0; i--) {
-                let jp = jetParticles[i];
-                jp.x += jp.vx;
-                jp.y += jp.vy;
-                jp.life--;
-                if (jp.life <= 0) jetParticles.splice(i, 1);
+            // 5. Partículas y Textos
+            for (let i = fxParticles.length - 1; i >= 0; i--) {
+                let pt = fxParticles[i];
+                pt.x += pt.vx;
+                pt.y += pt.vy;
+                pt.life--;
+                if (pt.life <= 0) fxParticles.splice(i, 1);
             }
 
-            // Verificar Victoria
-            if (fissures.every(f => f.sealed) && coreState.pressure >= 65 && coreState.battery >= 70 && coreState.battery <= 85 && coreState.ph >= 6.0) {
-                endGame(true, "¡NÚCLEO ESTABILIZADO Y PRESURIZADO!", 
-                    "Has aplicado la secuencia hemostática correcta: control del pH ácido, modulación de flujo portal, sellado mecánico exacto y reposición restrictiva.");
+            for (let i = floatTexts.length - 1; i >= 0; i--) {
+                let ft = floatTexts[i];
+                ft.y -= 0.7;
+                ft.life--;
+                if (ft.life <= 0) floatTexts.splice(i, 1);
+            }
+
+            // 6. Condición de Victoria
+            if (bosses.every(b => b.defeated) && bioState.hp >= 60) {
+                endGame(true, "¡MAZMORRA DE TREITZ CONQUISTADA!", 
+                    "Has derrotado a ambos Titanes aplicando la secuencia hemostática correcta: doble terapia mecánica bajo pH neutralizado y ligadura selectiva bajo control hemodinámico.");
                 return;
             }
 
-            render();
-            updateTelemetry();
+            updateHud();
         }
 
-        // Lógica de Mecanismos de Reparación (Reglas Médicas Trasvestidas)
-        function handleFissureInteraction(fissure, tool) {
-            // Regla 1: Corrosión ácida destruye el sello
-            if (coreState.ph < 6.0 && tool === 'grapa') {
-                createFloatingText("¡ERROR!: pH ácido disolvió la grapa (Inactiva la pepsina primero)", "#ef4444");
-                return;
-            }
+        // Lógica de Hechizos contra los Jefes (Reglas de HDA)
+        function handleBossSpellHit(boss, spellType) {
+            // CASO 1: TITÁN ÚLCERA PÉPTICA
+            if (boss.type === 'ulcer') {
+                if (spellType === 2) { // Glacius / Adrenalina
+                    boss.frozen = true;
+                    boss.frozenTimer = 300; // 5 segundos congelado
+                    spawnFloatText(boss.x, boss.y - 25, "¡CONGELADO! Chorro arterial frenado (Adrenalina 1:10.000)", "#38bdf8");
+                    spawnParticles(boss.x + 35, boss.y + 40, '#38bdf8', 25);
+                    return;
+                }
 
-            // Caso Fisura Erosiva (Úlcera Forrest Ia)
-            if (fissure.type === 'erosion') {
-                if (tool === 'anillo') {
-                    createFloatingText("¡INEFICAZ!: El anillo elástico no puede estrangular una fisura plana", "#fbbf24");
-                    return;
-                }
-                if (tool === 'crio') {
-                    fissure.crioApplied = true;
-                    createFloatingText("Criospray aplicado: Fuga reducida transitoriamente (Vasoconstricción local)", "#38bdf8");
-                    return;
-                }
-                if (tool === 'grapa') {
-                    if (fissure.crioApplied) {
-                        fissure.sealed = true;
-                        createFloatingText("¡DOBLE SELLO PERFECTO!: Crio + Grapa mecánica. Fisura reparada", "#34d399");
+                if (spellType === 3) { // Grapa de Titanio / Endoclip
+                    // Regla de Oro: Si pH < 6.0, el ácido derrite la grapa
+                    if (bioState.ph < 6.0) {
+                        spawnFloatText(boss.x, boss.y - 30, "¡FALLO!: El pH ácido (2.0) disolvió la grapa. ¡Usa Hechizo [1] (Alcalium/IBP) primero!", "#ef4444");
+                        spawnParticles(boss.x + 35, boss.y + 40, '#ef4444', 18);
+                        return;
+                    }
+
+                    if (boss.frozen) {
+                        boss.defeated = true;
+                        spawnFloatText(boss.x, boss.y - 30, "¡DOBLE TERAPIA PERFECTA! Crio + Grapa (Forrest III sellado)", "#34d399");
+                        spawnParticles(boss.x + 35, boss.y + 40, '#22c55e', 35);
                     } else {
-                        fissure.sealed = true;
-                        createFloatingText("Grapa fijada sin enfriamiento previo. Falla contenida", "#eab308");
+                        boss.defeated = true;
+                        spawnFloatText(boss.x, boss.y - 30, "¡Grapa fijada! Úlcera contenida", "#eab308");
+                        spawnParticles(boss.x + 35, boss.y + 40, '#eab308', 25);
                     }
                     return;
                 }
+
+                if (spellType === 4) { // Anillo / Banda
+                    spawnFloatText(boss.x, boss.y - 25, "¡INEFICAZ! El anillo no puede estrangular un cráter plano", "#fbbf24");
+                }
             }
 
-            // Caso Colector Hiperpresurizado (Várices Esofágicas)
-            if (fissure.type === 'colector') {
-                if (tool === 'crio') {
-                    // Grave iatrogenia: inyectar adrenalina en una várice
-                    fissure.flowRate *= 1.8;
-                    coreState.pressure -= 10;
-                    createFloatingText("¡DETONACIÓN!: El choque criogénico reventó la pared delgada del colector", "#ef4444");
+            // CASO 2: TITÁN VÁRICE PORTAL
+            if (boss.type === 'varice') {
+                if (spellType === 2) { // Adrenalina en Várice = IATROGENIA
+                    spawnFloatText(boss.x, boss.y - 35, "¡DETONACIÓN! El choque criogénico reventó la pared venosa delgada", "#ef4444");
+                    spawnParticles(boss.x + 40, boss.y + 45, '#ef4444', 35);
+                    heroTakeDamage(25, "¡EXPLOSIÓN VENOSA POR ADRENALINA EN VÁRICE!");
                     return;
                 }
-                if (tool === 'grapa') {
-                    createFloatingText("¡RECHAZO!: Las grapas desgarran el colector venoso de alta presión", "#fbbf24");
+
+                if (spellType === 3) { // Grapa en Várice = ERROR
+                    spawnFloatText(boss.x, boss.y - 25, "¡RECHAZO! Las grapas cortantes desgarran las várices", "#fbbf24");
                     return;
                 }
-                if (tool === 'anillo') {
-                    fissure.sealed = true;
-                    fissure.ringApplied = true;
-                    createFloatingText("¡ANILLO DE COMPRESIÓN FIJADO! Tensión portal estrangulada", "#34d399");
-                    return;
+
+                if (spellType === 4) { // Anillo Estrangulador / Banda
+                    if (!bioState.bypassActive) {
+                        spawnFloatText(boss.x, boss.y - 25, "¡FALLO! La alta tensión portal desprendió el anillo. Activa la Runa Bypass [5] primero.", "#f97316");
+                        return;
+                    }
+
+                    boss.defeated = true;
+                    boss.banded = true;
+                    spawnFloatText(boss.x, boss.y - 30, "¡ESTRANGULACIÓN PERFECTA! Várice ligada con banda elástica", "#34d399");
+                    spawnParticles(boss.x + 40, boss.y + 45, '#34d399', 40);
                 }
             }
         }
 
-        // Renderizado Canvas
+        function heroTakeDamage(amount, msg) {
+            bioState.hp = Math.max(0, bioState.hp - amount);
+            spawnFloatText(hero.x, hero.y - 20, msg, "#f87171");
+            spawnParticles(hero.x + 14, hero.y + 22, "#ef4444", 15);
+        }
+
+        function checkOverlap(r1, r2) {
+            return (
+                r1.x < r2.x + r2.w &&
+                r1.x + (r1.width || r1.w) > r2.x &&
+                r1.y < r2.y + r2.h &&
+                r1.y + (r1.height || r1.h) > r2.y
+            );
+        }
+
+        function spawnParticles(x, y, color, count) {
+            for (let i = 0; i < count; i++) {
+                fxParticles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    color: color,
+                    life: Math.random() * 25 + 15
+                });
+            }
+        }
+
+        function spawnFloatText(x, y, text, color) {
+            floatTexts.push({ x: x, y: y, text: text, color: color, life: 90 });
+        }
+
+        function updateHud() {
+            const hpHud = document.getElementById('hud-hp');
+            hpHud.textContent = `${Math.round(bioState.hp)}%`;
+            hpHud.style.color = bioState.hp > 60 ? '#34d399' : (bioState.hp > 30 ? '#fbbf24' : '#f87171');
+
+            const pamHud = document.getElementById('hud-pam');
+            pamHud.textContent = `${bioState.bypassActive ? '68 PSI [Bypass V1]' : '75 PSI'}`;
+
+            const phHud = document.getElementById('hud-ph');
+            phHud.textContent = `${bioState.ph.toFixed(1)} ${bioState.ph >= 6.0 ? '(Alcalino OK)' : '(Ácido Corrosivo)'}`;
+            phHud.style.color = bioState.ph >= 6.0 ? '#34d399' : '#f87171';
+        }
+
+        // Renderizado Completo del Mundo 2D
         function render() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Fondo y Rejilla
-            ctx.strokeStyle = '#0f172a';
-            ctx.lineWidth = 1;
-            for (let x = 0; x < canvas.width; x += 40) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-            }
-            for (let y = 0; y < canvas.height; y += 40) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-            }
+            ctx.save();
+            ctx.translate(-cameraX, 0);
 
-            // Lago de Líquido Inundante (Fondo)
-            let floodY = canvas.height - (canvas.height * (coreState.flooding / 100));
-            ctx.fillStyle = 'rgba(69, 10, 10, 0.45)';
-            ctx.fillRect(0, floodY, canvas.width, canvas.height - floodY);
+            // Fondo de la Mazmorra
+            ctx.fillStyle = '#090d16';
+            ctx.fillRect(cameraX, 0, canvas.width, canvas.height);
 
-            // Línea de Alerta Treitz
-            ctx.strokeStyle = '#38bdf8';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([6, 6]);
-            ctx.beginPath();
-            ctx.moveTo(0, 75);
-            ctx.lineTo(canvas.width, 75);
-            ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.fillStyle = '#64748b';
-            ctx.font = '10px monospace';
-            ctx.fillText("LÍMITE HIDRÁULICO TREITZ // SECTOR DE ALTA PRESIÓN", 15, 68);
-
-            // Renderizar Tuberías y Fisuras
-            fissures.forEach(f => {
-                // Tubería
-                ctx.fillStyle = '#1e293b';
-                ctx.fillRect(f.x - 45, f.y - 15, 90, 30);
-                ctx.strokeStyle = '#475569';
-                ctx.strokeRect(f.x - 45, f.y - 15, 90, 30);
-
-                // Orificio
+            // Columnas y antorchas en el fondo
+            for (let i = 0; i < 2400; i += 280) {
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(i, 40, 45, 400);
+                // Antorcha mágica
+                ctx.fillStyle = '#f59e0b';
                 ctx.beginPath();
-                ctx.arc(f.x, f.y, 16, 0, Math.PI * 2);
-                ctx.fillStyle = f.sealed ? '#065f46' : (f.type === 'colector' ? '#881337' : '#991b1b');
+                ctx.arc(i + 22, 160, 6 + Math.sin(Date.now() * 0.01 + i) * 2, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.strokeStyle = f.sealed ? '#34d399' : '#f87171';
-                ctx.lineWidth = 3;
+            }
+
+            // Plataformas
+            platforms.forEach(p => {
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(p.x, p.y, p.w, p.h);
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(p.x, p.y, p.w, p.h);
+
+                // Borde superior brillante
+                ctx.fillStyle = '#60a5fa';
+                ctx.fillRect(p.x, p.y, p.w, 3);
+            });
+
+            // Esbirros de Pepsina (Monstruos tipo Goomba / Babosas)
+            minions.forEach(m => {
+                ctx.fillStyle = '#10b981';
+                ctx.beginPath();
+                ctx.arc(m.x + m.w/2, m.y + m.h/2, m.w/2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#34d399';
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // Cartela de Falla
-                ctx.fillStyle = '#f8fafc';
+                // Ojos
+                ctx.fillStyle = '#000';
+                ctx.fillRect(m.x + (m.vx > 0 ? 16 : 6), m.y + 8, 4, 4);
+
+                // Texto sobre el esbirro
+                ctx.fillStyle = '#a7f3d0';
                 ctx.font = 'bold 9px monospace';
-                ctx.textAlign = 'center';
-                ctx.fillText(f.label, f.x, f.y - 25);
-                ctx.fillText(f.sealed ? "[SELLADO OK]" : "[FUGA ACTIVA]", f.x, f.y + 32);
+                ctx.fillText("PEPSINA", m.x - 4, m.y - 6);
+            });
 
-                if (f.crioApplied && !f.sealed) {
-                    ctx.strokeStyle = '#38bdf8';
+            // Titanes (Jefes de Acción)
+            bosses.forEach(b => {
+                // Color y forma del Jefe
+                if (b.type === 'ulcer') {
+                    ctx.fillStyle = b.defeated ? '#15803d' : (b.frozen ? '#0284c7' : '#b91c1c');
+                    ctx.fillRect(b.x, b.y, b.w, b.h);
+                    ctx.strokeStyle = b.defeated ? '#4ade80' : (b.frozen ? '#38bdf8' : '#ef4444');
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(b.x, b.y, b.w, b.h);
+
+                    // Chorro de fuego/sangre superior si está activo
+                    if (!b.defeated && !b.frozen) {
+                        ctx.fillStyle = '#ef4444';
+                        ctx.beginPath();
+                        ctx.moveTo(b.x + b.w/2 - 10, b.y);
+                        ctx.lineTo(b.x + b.w/2 + 10, b.y);
+                        ctx.lineTo(b.x + b.w/2, b.y - 35 - Math.random() * 15);
+                        ctx.fill();
+                    }
+                } else if (b.type === 'varice') {
+                    ctx.fillStyle = b.defeated ? '#15803d' : '#6b21a8';
                     ctx.beginPath();
-                    ctx.arc(f.x, f.y, 22, 0, Math.PI * 2);
+                    ctx.roundRect(b.x, b.y, b.w, b.h, 20);
+                    ctx.fill();
+                    ctx.strokeStyle = b.defeated ? '#4ade80' : '#c084fc';
+                    ctx.lineWidth = 3;
                     ctx.stroke();
+
+                    if (b.banded) {
+                        ctx.strokeStyle = '#f59e0b';
+                        ctx.lineWidth = 6;
+                        ctx.strokeRect(b.x + 10, b.y + b.h/2 - 6, b.w - 20, 12);
+                    }
                 }
+
+                // Cartela de Jefe
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = 'bold 11px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText(b.name, b.x + b.w/2, b.y - 12);
+                ctx.fillText(b.defeated ? "[DERROTADO]" : (b.frozen ? "[CONGELADO - ¡CLAVA LA GRAPA!]" : "[FUEGO ACTIVO]"), b.x + b.w/2, b.y + b.h + 18);
             });
 
-            // Partículas de Fuga
-            jetParticles.forEach(jp => {
-                ctx.fillStyle = jp.color;
-                ctx.beginPath();
-                ctx.arc(jp.x, jp.y, 3, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            // Proyectiles
-            toolProjectiles.forEach(p => {
+            // Proyectiles Mágicos
+            spells.forEach(p => {
                 ctx.save();
                 ctx.translate(p.x, p.y);
-                if (p.type === 'grapa') {
-                    ctx.fillStyle = '#eab308';
-                    ctx.fillRect(-6, -3, 12, 6);
-                } else if (p.type === 'crio') {
+                if (p.type === 2) { // Glacius
                     ctx.fillStyle = '#38bdf8';
-                    ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
-                } else if (p.type === 'anillo') {
+                    ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI * 2); ctx.fill();
+                } else if (p.type === 3) { // Grapa
+                    ctx.fillStyle = '#eab308';
+                    ctx.fillRect(-8, -4, 16, 8);
+                } else if (p.type === 4) { // Anillo
                     ctx.strokeStyle = '#f97316';
-                    ctx.lineWidth = 3;
-                    ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.stroke();
+                    ctx.lineWidth = 4;
+                    ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.stroke();
                 }
                 ctx.restore();
             });
 
-            // Drone del Jugador
+            // EL HÉROE (Estilo Hechicero / Super Mario)
             ctx.save();
-            ctx.translate(drone.x, drone.y);
-            ctx.rotate(drone.aimAngle);
+            ctx.translate(hero.x, hero.y);
 
-            // Cañón
-            ctx.fillStyle = '#475569';
-            ctx.fillRect(8, -3, 16, 6);
+            // Túnica / Cuerpo
+            ctx.fillStyle = '#2563eb';
+            ctx.fillRect(4, 14, hero.width - 8, hero.height - 14);
 
-            // Chasis
-            ctx.fillStyle = '#0284c7';
+            // Cabeza
+            ctx.fillStyle = '#fed7aa';
+            ctx.fillRect(6, 4, hero.width - 12, 12);
+
+            // Sombrero puntiagudo de Hechicero (Harry Potter)
+            ctx.fillStyle = '#1e3a8a';
             ctx.beginPath();
-            ctx.arc(0, 0, drone.radius, 0, Math.PI * 2);
+            ctx.moveTo(2, 6);
+            ctx.lineTo(hero.width - 2, 6);
+            ctx.lineTo(hero.facingRight ? hero.width + 4 : -4, -14);
             ctx.fill();
-            ctx.strokeStyle = '#38bdf8';
-            ctx.lineWidth = 2;
-            ctx.stroke();
 
-            // Indicador de Herramienta cargada
-            let toolColor = drone.currentTool === 'grapa' ? '#eab308' : (drone.currentTool === 'crio' ? '#38bdf8' : '#f97316');
-            ctx.fillStyle = toolColor;
+            // Ojos
+            ctx.fillStyle = '#000';
+            ctx.fillRect(hero.facingRight ? hero.width - 10 : 8, 8, 3, 3);
+
+            // Varita Mágica apuntando al cursor
+            ctx.save();
+            ctx.translate(14, 18);
+            ctx.rotate(hero.aimAngle);
+            ctx.fillStyle = '#92400e';
+            ctx.fillRect(4, -2, 18, 4);
+            // Punta brillante de la varita
+            let wandColor = activeSpell === 2 ? '#38bdf8' : (activeSpell === 3 ? '#eab308' : (activeSpell === 4 ? '#f97316' : '#fde047'));
+            ctx.fillStyle = wandColor;
             ctx.beginPath();
-            ctx.arc(0, 0, 5, 0, Math.PI * 2);
+            ctx.arc(22, 0, 4, 0, Math.PI * 2);
             ctx.fill();
+            ctx.restore();
+
+            // Pies
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(4, hero.height - 4, 8, 4);
+            ctx.fillRect(hero.width - 12, hero.height - 4, 8, 4);
 
             ctx.restore();
 
+            // Partículas
+            fxParticles.forEach(pt => {
+                ctx.fillStyle = pt.color;
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
             // Textos Flotantes
-            for (let i = floatingTexts.length - 1; i >= 0; i--) {
-                let ft = floatingTexts[i];
+            floatTexts.forEach(ft => {
                 ctx.fillStyle = ft.color;
                 ctx.font = 'bold 12px monospace';
                 ctx.textAlign = 'center';
                 ctx.fillText(ft.text, ft.x, ft.y);
-                ft.y -= 0.6;
-                ft.life--;
-                if (ft.life <= 0) floatingTexts.splice(i, 1);
-            }
+            });
 
-            // HUD del Drone (Herramienta activa)
-            ctx.fillStyle = '#e2e8f0';
-            ctx.font = '10px monospace';
-            ctx.textAlign = 'left';
-            ctx.fillText(`HERRAMIENTA [Q para cambiar]: ${drone.currentTool.toUpperCase()}`, 15, canvas.height - 15);
+            ctx.restore();
         }
 
-        function updateTelemetry() {
-            // Actualizar HUD superior
-            let m = Math.floor(gameTime / 3600).toString().padStart(2, '0');
-            let s = Math.floor((gameTime % 3600) / 60).toString().padStart(2, '0');
-            document.getElementById('time-display').textContent = `${m}:${s}`;
-
-            // Actualizar Telemetría
-            const pEl = document.getElementById('tel-pressure');
-            pEl.textContent = `${Math.round(coreState.pressure)} PSI [Meta ≥65]`;
-            pEl.className = coreState.pressure >= 65 ? 'val-good' : 'val-bad';
-
-            const bEl = document.getElementById('tel-battery');
-            bEl.textContent = `${Math.round(coreState.battery)}% [Meta 70-80%]`;
-            bEl.className = (coreState.battery >= 70 && coreState.battery <= 85) ? 'val-good' : 'val-warn';
-
-            const phEl = document.getElementById('tel-ph');
-            phEl.textContent = `${coreState.ph.toFixed(1)} ${coreState.ph >= 6.0 ? '[Estable]' : '[Corrosivo]'}`;
-            phEl.className = coreState.ph >= 6.0 ? 'val-good' : 'val-bad';
-
-            const fEl = document.getElementById('tel-flood');
-            fEl.textContent = `${Math.round(coreState.flooding)}%`;
-            fEl.className = coreState.flooding > 70 ? 'val-bad' : 'val-good';
-
-            const tEl = document.getElementById('tel-turbine');
-            tEl.textContent = coreState.turbineProtected ? "SELLADO HERMÉTICO" : "EXPUESTO A INUNDACIÓN";
-            tEl.className = coreState.turbineProtected ? 'val-good' : 'val-bad';
-        }
-
-        function endGame(victory, title, debrief) {
+        function endGame(victory, title, feedback) {
             isRunning = false;
-            if (gameLoopId) clearInterval(gameLoopId);
+            if (animationId) cancelAnimationFrame(animationId);
 
             const screen = document.getElementById('gameover-screen');
             const titleEl = document.getElementById('over-title');
             const reasonEl = document.getElementById('over-reason');
-            const debriefEl = document.getElementById('over-debrief');
+            const fbEl = document.getElementById('over-feedback');
 
             titleEl.textContent = title;
-            titleEl.style.color = victory ? '#34d399' : '#f87171';
-            reasonEl.textContent = debrief;
+            titleEl.style.color = victory ? '#34d399' : '#ef4444';
+            reasonEl.textContent = feedback;
 
-            debriefEl.innerHTML = `
-                <strong style="color: #fbbf24;">DEBRIEFING TÉCNICO (TRADUCCIÓN CLÍNICA):</strong><br>
-                • <strong>Presión Hidráulica = PAM:</strong> Los órganos nobles se apagan bajo 65 mmHg; resucitar con bolos prudentes.<br>
-                • <strong>Batería = Estrategia Transfusional:</strong> Subir de 80% (Hb >8 g/dL) eleva la presión transmural y desaloja el trombo.<br>
-                • <strong>pH del Refrigerante = Estabilidad del Coágulo:</strong> La pepsina gástrica disuelve el tapón plaquetario a pH <6.0 (el IBP es mandatorio).<br>
-                • <strong>Turbina = Vía Aérea:</strong> La aspiración hemática masiva es letal si no se aísla con IOT antes del procedimiento.
+            fbEl.innerHTML = `
+                <strong style="color: #fbbf24;">LECCIONES CLÍNICAS DE LA MAZMORRA DE TREITZ:</strong><br>
+                • <strong>Pepsina y pH ácido (&lt;6.0):</strong> En medio ácido, la pepsina degrada el coágulo y desprende los clips mecánicos; el IBP en bolo es obligatorio.<br>
+                • <strong>Úlcera Péptica (Forrest Ia):</strong> La doble terapia combina infiltración (adrenalina) para frenar el chorro y endoclip mecánico definitivo.<br>
+                • <strong>Várices Esofágicas:</strong> ¡La adrenalina está contraindicada porque perfora la pared venosa! Requiere Terlipresina (vasoconstrictor esplácnico V1) y Ligadura con Bandas.
             `;
 
             screen.classList.remove('hidden');
