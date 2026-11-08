@@ -181,17 +181,20 @@
             <!-- Pantalla de Inicio -->
             <div id="start-screen" class="overlay-screen">
                 <h1 style="color: #60a5fa; font-size: 2rem; margin-bottom: 6px; letter-spacing: 2px;">EL HECHICERO DE TREITZ</h1>
-                <div style="font-size: 0.95rem; color: #cbd5e1; margin-bottom: 16px;">¡Supera las plataformas, esquiva el ácido y derrota a los 2 Titanes de la Sangre!</div>
+                <div style="font-size: 0.95rem; color: #cbd5e1; margin-bottom: 16px;">¡Acción retro estilo Super Mario: sin mouse, con hechizos directos por teclado!</div>
 
-                <div style="background: #090d16; border: 1px solid #1e293b; padding: 14px 20px; border-radius: 10px; max-width: 650px; text-align: left; font-size: 0.8rem; line-height: 1.6;">
-                    <strong style="color: #fbbf24;">CONTROLES DE ACCIÓN REAL:</strong><br>
-                    • <kbd>A</kbd> / <kbd>D</kbd> o Flechas: <strong>Moverse</strong><br>
-                    • <kbd>W</kbd>, <kbd>Espacio</kbd> o Flecha Arriba: <strong>Saltar plataformas</strong><br>
-                    • <kbd>CLIC IZQUIERDO</kbd>: <strong>Lanzar Hechizo con la Varita hacia el cursor</strong><br>
-                    • <kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>, <kbd>4</kbd> o Clic en la barra: <strong>Cambiar Hechizo activo</strong><br><br>
-                    <strong style="color: #38bdf8;">REGLAS SECRETAS DE FISIOPATOLOGÍA CLÍNICA:</strong><br>
-                    1. <strong>Titán Úlcera (Rojo fuego):</strong> Si el pH de la cueva es ácido (&lt;6.0), tu Grapa se derrite al instante. ¡Debes neutralizar con el hechizo <kbd>[1]</kbd> (Omeprazol), congelar su chorro con <kbd>[2]</kbd> (Adrenalina) y clavarle la Grapa <kbd>[3]</kbd> (Endoclip)!<br>
-                    2. <strong>Titán Várice (Gólem Púrpura):</strong> Si le disparas Adrenalina o Grapas, ¡la pared venosa estalla y te mata! Debes activar la Runa de Descompresión <kbd>[4]</kbd> (Terlipresina) y luego capturarlo con el Anillo Elástico <kbd>[2]</kbd> (Banda).
+                <div style="background: #090d16; border: 1px solid #1e293b; padding: 14px 20px; border-radius: 10px; max-width: 680px; text-align: left; font-size: 0.82rem; line-height: 1.6;">
+                    <strong style="color: #fbbf24;">CONTROLES DE PLATAFORMAS (100% TECLADO):</strong><br>
+                    • <kbd>FLECHAS IZQ / DER</kbd> (o <kbd>A</kbd> / <kbd>D</kbd>): <strong>Moverse y cambiar dirección</strong><br>
+                    • <kbd>ESPACIO</kbd> o <kbd>FLECHA ARRIBA</kbd>: <strong>Saltar plataformas</strong> (doble salto habilitado)<br>
+                    • <strong>DISPARO DIRECTO EN LA DIRECCIÓN QUE MIRAS:</strong><br>
+                    &nbsp;&nbsp;» <kbd>Q</kbd>: <strong>ALCALIUM (IBP)</strong> — Eleva pH &gt;6.0 y destruye a las babosas de Pepsina.<br>
+                    &nbsp;&nbsp;» <kbd>W</kbd>: <strong>GLACIUS (Adrenalina 1:10k)</strong> — Congela el fuego del Gólem Úlcera.<br>
+                    &nbsp;&nbsp;» <kbd>E</kbd>: <strong>GRAPA TITANIO (Endoclip)</strong> — Clava el clip en la úlcera (¡requiere pH &gt;6.0!).<br>
+                    &nbsp;&nbsp;» <kbd>A</kbd>: <strong>RUNA BYPASS (Terlipresina V1)</strong> — Despresuriza el flujo portal de Medusa Várice.<br>
+                    &nbsp;&nbsp;» <kbd>S</kbd>: <strong>ANILLO ESTRANGULADOR (Banda)</strong> — Liga el cordón variceal de Medusa.<br>
+                    &nbsp;&nbsp;» <kbd>R</kbd>: <strong>TRANSFUSIÓN RESTRICTIVA (Gatillo Villanueva)</strong> — Recupera 18% Hb sólo si estás bajo el 70%.<br><br>
+                    <strong style="color: #ef4444;">COMPLEJIDAD CLÍNICA:</strong> Si transfundes (<kbd>R</kbd>) con vida &gt;70%, sobrecargas la presión portal y los titanes desatan proyectiles de resangrado.
                 </div>
 
                 <button class="btn-play" onclick="startGame()">¡COMENZAR AVENTURA!</button>
@@ -208,32 +211,37 @@
 
         <!-- Barra Inferior de Hechizos -->
         <div class="spell-bar">
-            <div style="color: #94a3b8;">LIBRO DE HECHIZOS:</div>
+            <div style="color: #94a3b8;">LANZAMIENTO DIRECTO:</div>
             <div class="spells-list">
-                <!-- 1: Alcalium / IBP -->
-                <div class="spell-card" id="card-spell-1" onclick="selectSpell(1)">
-                    <span class="spell-key">[1]</span>
-                    <div><strong>ALCALIUM</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Sube pH &gt;6.0 (Omeprazol)</span></div>
+                <!-- Q: Alcalium / IBP -->
+                <div class="spell-card" id="card-spell-1">
+                    <span class="spell-key">[Q]</span>
+                    <div><strong>ALCALIUM</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">IBP (Mata Pepsina / pH &gt;6.0)</span></div>
                 </div>
-                <!-- 2: Crio / Adrenalina -->
-                <div class="spell-card" id="card-spell-2" onclick="selectSpell(2)">
-                    <span class="spell-key">[2]</span>
-                    <div><strong>GLACIUS JET</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Congela Chorro Úlcera</span></div>
+                <!-- W: Crio / Adrenalina -->
+                <div class="spell-card" id="card-spell-2">
+                    <span class="spell-key">[W]</span>
+                    <div><strong>GLACIUS</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Adrenalina (Congela Gólem)</span></div>
                 </div>
-                <!-- 3: Endoclip / Grapa -->
-                <div class="spell-card spell-active" id="card-spell-3" onclick="selectSpell(3)">
-                    <span class="spell-key">[3]</span>
-                    <div><strong>GRAPA TITANIO</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Sello Mecánico Úlcera</span></div>
+                <!-- E: Endoclip / Grapa -->
+                <div class="spell-card" id="card-spell-3">
+                    <span class="spell-key">[E]</span>
+                    <div><strong>GRAPA TITANIO</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Endoclip (Sella Gólem)</span></div>
                 </div>
-                <!-- 4: Banda / Anillo de Compresión -->
-                <div class="spell-card" id="card-spell-4" onclick="selectSpell(4)">
-                    <span class="spell-key">[4]</span>
-                    <div><strong>ANILLO ESTRANGULADOR</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Liga la Várice Portal</span></div>
+                <!-- A: Terlipresina Runa -->
+                <div class="spell-card" id="card-spell-5">
+                    <span class="spell-key">[A]</span>
+                    <div><strong>RUNA BYPASS</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Terlipresina V1 (Frena Medusa)</span></div>
                 </div>
-                <!-- 5: Terlipresina Runa -->
-                <div class="spell-card" id="card-spell-5" onclick="selectSpell(5)">
-                    <span class="spell-key">[5]</span>
-                    <div><strong>RUNA BYPASS</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Frena Flujo V1 (Terlipresina)</span></div>
+                <!-- S: Banda / Anillo de Compresión -->
+                <div class="spell-card" id="card-spell-4">
+                    <span class="spell-key">[S]</span>
+                    <div><strong>ANILLO BANDA</strong><br><span style="font-size: 0.65rem; color: #94a3b8;">Ligadura (Sella Medusa)</span></div>
+                </div>
+                <!-- R: Transfusión restrictiva -->
+                <div class="spell-card" id="card-spell-6">
+                    <span class="spell-key">[R]</span>
+                    <div><strong>TRANSFUSIÓN</strong><br><span style="font-size: 0.65rem; color: #f43f5e;">Gatillo Restrictivo (&lt;70%)</span></div>
                 </div>
             </div>
         </div>
@@ -255,9 +263,6 @@
             bypassTime: 0
         };
 
-        // Hechizo Seleccionado (1 a 5)
-        let activeSpell = 3; // Por defecto: Grapa de Titanio
-
         // Héroe (Super Mario / Harry Potter)
         const hero = {
             x: 100,
@@ -266,14 +271,14 @@
             height: 44,
             vx: 0,
             vy: 0,
-            speed: 5.2,
+            speed: 5.6,
             jumpPower: -12.5,
             grounded: false,
             facingRight: true,
-            aimAngle: 0
+            jumpsLeft: 2
         };
 
-        const GRAVITY = 0.6;
+        const GRAVITY = 0.58;
         let cameraX = 0;
 
         // Plataformas del Nivel
@@ -284,6 +289,8 @@
         let minions = [];
         // Proyectiles del Héroe
         let spells = [];
+        // Proyectiles enemigos (Gólem y Medusa)
+        let enemyProjectiles = [];
         // Efectos visuales y textos flotantes
         let fxParticles = [];
         let floatTexts = [];
@@ -292,14 +299,25 @@
         const keys = {};
 
         window.addEventListener('keydown', e => {
-            keys[e.key.toLowerCase()] = true;
-            if (e.key >= '1' && e.key <= '5') {
-                selectSpell(parseInt(e.key));
-            }
-            if ((e.key === ' ' || e.key.toLowerCase() === 'w' || e.key === 'ArrowUp') && hero.grounded) {
+            const k = e.key.toLowerCase();
+            keys[k] = true;
+
+            // Salto (Espacio, Flecha Arriba) con Doble Salto estilo Mario
+            if ((k === ' ' || e.key === 'ArrowUp') && hero.jumpsLeft > 0) {
                 hero.vy = hero.jumpPower;
+                hero.jumpsLeft--;
                 hero.grounded = false;
-                spawnParticles(hero.x + hero.width/2, hero.y + hero.height, '#64748b', 6);
+                spawnParticles(hero.x + hero.width/2, hero.y + hero.height, '#64748b', 8);
+            }
+
+            // Lanzamiento directo de hechizos fijos por teclas (sin ratón):
+            if (isRunning) {
+                if (k === 'q') castDirectSpell(1); // Alcalium (IBP)
+                if (k === 'w') castDirectSpell(2); // Glacius (Adrenalina)
+                if (k === 'e') castDirectSpell(3); // Grapa (Endoclip)
+                if (k === 'a') castDirectSpell(5); // Runa Bypass (Terlipresina)
+                if (k === 's') castDirectSpell(4); // Anillo Banda (Ligadura)
+                if (k === 'r') triggerTransfusion(); // Transfusión Restrictiva (Villanueva)
             }
         });
 
@@ -307,82 +325,95 @@
             keys[e.key.toLowerCase()] = false;
         });
 
-        canvas.addEventListener('mousemove', e => {
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left + cameraX;
-            const mouseY = e.clientY - rect.top;
-            hero.aimAngle = Math.atan2(mouseY - (hero.y + 16), mouseX - (hero.x + 14));
-            hero.facingRight = mouseX >= (hero.x + 14);
-        });
-
-        canvas.addEventListener('mousedown', e => {
-            if (!isRunning) return;
-            castSpell();
-        });
-
-        function selectSpell(id) {
-            activeSpell = id;
-            for (let i = 1; i <= 5; i++) {
-                const card = document.getElementById(`card-spell-${i}`);
-                if (card) {
-                    if (i === id) card.classList.add('spell-active');
-                    else card.classList.remove('spell-active');
-                }
-            }
-        }
-
-        function castSpell() {
-            // TODOS los hechizos (1 al 5) se disparan con la varita apuntando al cursor
-            const speed = 12;
-            const originX = hero.x + (hero.facingRight ? hero.width + 4 : -4);
+        // Disparo directo en la dirección frontal del héroe (Estilo Super Mario Fireball)
+        function castDirectSpell(spellId) {
+            const speed = 13.5;
+            const dir = hero.facingRight ? 1 : -1;
+            const originX = hero.x + (hero.facingRight ? hero.width + 6 : -6);
             const originY = hero.y + 18;
 
             spells.push({
                 x: originX,
                 y: originY,
-                vx: Math.cos(hero.aimAngle) * speed,
-                vy: Math.sin(hero.aimAngle) * speed,
-                type: activeSpell,
-                life: 80
+                vx: dir * speed,
+                vy: 0, // Trayectoria horizontal fija
+                type: spellId,
+                life: 90
             });
 
-            // Colores por hechizo: 1: Dorado (IBP), 2: Celeste (Adrenalina), 3: Plateado (Clip), 4: Naranja (Banda), 5: Púrpura (Terlipresina)
+            // Feedback visual en la barra inferior
+            flashSpellCard(spellId);
+
             const colors = { 1: '#fde047', 2: '#38bdf8', 3: '#cbd5e1', 4: '#f97316', 5: '#c084fc' };
-            spawnParticles(originX, originY, colors[activeSpell] || '#fff', 8);
+            spawnParticles(originX, originY, colors[spellId] || '#fff', 10);
+        }
+
+        function flashSpellCard(id) {
+            const card = document.getElementById(`card-spell-${id}`);
+            if (card) {
+                card.classList.add('spell-active');
+                setTimeout(() => card.classList.remove('spell-active'), 250);
+            }
+        }
+
+        // Complejidad Clínica: Transfusión Restrictiva con Gatillo Villanueva
+        function triggerTransfusion() {
+            flashSpellCard(6);
+            if (bioState.hp < 70) {
+                bioState.hp = Math.min(100, +(bioState.hp + 18).toFixed(1));
+                spawnFloatText(hero.x, hero.y - 25, "¡TRANSFUSIÓN ACERTADA! (Hb < 7.0 g/dL)", "#34d399");
+                spawnParticles(hero.x + 14, hero.y + 20, '#ef4444', 20);
+            } else {
+                // Iatrogenia por sobretransfusión: aumento de presión portal y resangrado
+                bioState.hp = Math.min(100, +(bioState.hp + 5).toFixed(1));
+                bioState.pam += 12;
+                spawnFloatText(hero.x, hero.y - 30, "¡SOBRETRANSFUSIÓN! (Hb ≥ 7.0) ↑ Presión Portal y Resangrado", "#f87171");
+                spawnParticles(hero.x + 14, hero.y + 20, '#b91c1c', 25);
+
+                // Provoca represalia de los titanes vivos
+                bosses.forEach(b => {
+                    if (!b.defeated) {
+                        spawnEnemyProjectile(b.x + b.w/2, b.y + 20, hero.x > b.x ? 6 : -6, -2, '#ef4444');
+                    }
+                });
+            }
+        }
+
+        function spawnEnemyProjectile(x, y, vx, vy, color) {
+            enemyProjectiles.push({ x, y, vx, vy, color, life: 120 });
         }
 
         function buildLevel() {
             // Plataformas fijas y obstáculos
             platforms = [
                 // Suelo base principal
-                { x: 0, y: 440, w: 2400, h: 60 },
+                { x: 0, y: 440, w: 2600, h: 60 },
 
-                // Plataformas flotantes sector 1 (Hacia el Titán Úlcera)
-                { x: 260, y: 350, w: 120, h: 20 },
-                { x: 440, y: 280, w: 140, h: 20 },
-                { x: 640, y: 220, w: 160, h: 20 },
-                { x: 860, y: 320, w: 200, h: 20 },
+                // Sector 1: Hacia el Gólem Úlcera
+                { x: 240, y: 350, w: 130, h: 20 },
+                { x: 420, y: 280, w: 150, h: 20 },
+                { x: 620, y: 220, w: 160, h: 20 },
+                { x: 840, y: 330, w: 220, h: 20 },
 
-                // Sector 2 (Hacia el Titán Várice)
-                { x: 1200, y: 340, w: 140, h: 20 },
-                { x: 1420, y: 260, w: 160, h: 20 },
-                { x: 1660, y: 190, w: 150, h: 20 },
-                { x: 1880, y: 310, w: 260, h: 20 },
+                // Sector 2: Hacia Medusa Várice
+                { x: 1180, y: 350, w: 140, h: 20 },
+                { x: 1380, y: 270, w: 160, h: 20 },
+                { x: 1620, y: 200, w: 160, h: 20 },
+                { x: 1840, y: 320, w: 260, h: 20 },
 
-                // Pared límite final
-                { x: 2360, y: 0, w: 40, h: 500 }
+                // Pared final
+                { x: 2500, y: 0, w: 40, h: 500 }
             ];
 
-            // 2 Titanes de la Sangre (Jefes de Acción)
+            // 2 Titanes de la Sangre (Jefes)
             bosses = [
                 {
                     id: 'ulcer',
-                    name: "TITÁN DE LA ROCA SANGRANTE (Úlcera Forrest Ia)",
+                    name: "GÓLEM DE LA ROCA (Úlcera Forrest Ia)",
                     x: 920,
-                    y: 240,
+                    y: 250,
                     w: 70,
                     h: 80,
-                    hp: 100,
                     type: 'ulcer',
                     frozen: false,
                     frozenTimer: 0,
@@ -391,12 +422,11 @@
                 },
                 {
                     id: 'varice',
-                    name: "HIDRA DEL COLECTOR PORTAL (Várice Esofágica)",
-                    x: 1980,
-                    y: 220,
+                    name: "MEDUSA DEL COLECTOR (Várice Esofágica)",
+                    x: 1940,
+                    y: 230,
                     w: 80,
                     h: 90,
-                    hp: 100,
                     type: 'varice',
                     banded: false,
                     defeated: false,
@@ -404,11 +434,12 @@
                 }
             ];
 
-            // Esbirros de Ácido Pepsina que patrullan
+            // Esbirros de Pepsina que patrullan
             minions = [
-                { x: 380, y: 410, w: 28, h: 28, vx: 1.8, minX: 300, maxX: 580 },
-                { x: 1300, y: 410, w: 28, h: 28, vx: -2.0, minX: 1200, maxX: 1550 },
-                { x: 1720, y: 410, w: 28, h: 28, vx: 2.2, minX: 1600, maxX: 1850 }
+                { x: 360, y: 412, w: 30, h: 28, vx: 1.8, minX: 280, maxX: 560 },
+                { x: 700, y: 192, w: 30, h: 28, vx: 1.5, minX: 630, maxX: 770 },
+                { x: 1260, y: 412, w: 30, h: 28, vx: -2.0, minX: 1180, maxX: 1520 },
+                { x: 1700, y: 412, w: 30, h: 28, vx: 2.2, minX: 1600, maxX: 1840 }
             ];
         }
 
@@ -420,6 +451,7 @@
             hero.y = 360;
             hero.vx = 0;
             hero.vy = 0;
+            hero.facingRight = true;
             cameraX = 0;
 
             bioState.hp = 100;
@@ -428,11 +460,11 @@
             bioState.bypassActive = false;
 
             spells = [];
+            enemyProjectiles = [];
             fxParticles = [];
             floatTexts = [];
 
             buildLevel();
-            selectSpell(3);
 
             isRunning = true;
             if (animationId) cancelAnimationFrame(animationId);
@@ -448,14 +480,14 @@
 
         function update() {
             // 1. Movimiento horizontal del Héroe
-            if (keys['a'] || keys['arrowleft']) {
+            if (keys['arrowleft']) {
                 hero.vx = -hero.speed;
                 hero.facingRight = false;
-            } else if (keys['d'] || keys['arrowright']) {
+            } else if (keys['arrowright']) {
                 hero.vx = hero.speed;
                 hero.facingRight = true;
             } else {
-                hero.vx *= 0.75;
+                hero.vx *= 0.72;
             }
 
             // Gravedad
@@ -466,26 +498,26 @@
             // Colisiones con Plataformas (AABB)
             hero.grounded = false;
             platforms.forEach(p => {
-                // Chequeo de colisión vertical (aterrizaje)
                 if (hero.x + hero.width > p.x && hero.x < p.x + p.w) {
                     if (hero.y + hero.height >= p.y && hero.y + hero.height <= p.y + p.h + hero.vy && hero.vy >= 0) {
                         hero.y = p.y - hero.height;
                         hero.vy = 0;
                         hero.grounded = true;
+                        hero.jumpsLeft = 2; // Reiniciar doble salto al tocar suelo
                     }
                 }
             });
 
             // Límites del mundo
             if (hero.x < 10) hero.x = 10;
-            if (hero.y > 480) { // Caída al vacío ácido
-                heroTakeDamage(25, "¡CAÍSTE AL LAGO DE ÁCIDO GASTRICO!");
-                hero.y = 350;
-                hero.x = Math.max(50, hero.x - 120);
+            if (hero.y > 480) { // Caída al ácido
+                heroTakeDamage(25, "¡CAÍSTE AL ÁCIDO GÁSTRICO!");
+                hero.y = 340;
+                hero.x = Math.max(50, hero.x - 140);
             }
 
             // Cámara sigue al jugador (centrada horizontalmente)
-            cameraX = Math.max(0, Math.min(hero.x - 400, 1440));
+            cameraX = Math.max(0, Math.min(hero.x - 380, 1500));
 
             // Fisiopatología: Efecto del Bypass (Terlipresina)
             if (bioState.bypassActive) {
@@ -500,13 +532,23 @@
             let activeBleed = 0;
             bosses.forEach(b => {
                 if (!b.defeated) {
-                    let rate = (b.type === 'varice' && bioState.bypassActive) ? 0.02 : 0.05;
+                    let rate = (b.type === 'varice' && bioState.bypassActive) ? 0.015 : 0.04;
                     activeBleed += rate;
                 }
             });
             bioState.hp = Math.max(0, +(bioState.hp - activeBleed).toFixed(2));
+
+            // CORRECCIÓN CONDICIÓN DE VICTORIA INMEDIATA:
+            // Si derrotas al Gólem y a Medusa, ¡GANAS DE INMEDIATO! Ya no exige hp >= 60.
+            if (bosses.every(b => b.defeated)) {
+                endGame(true, "¡VICTORIA CLÍNICA ABSOLUTA!", 
+                    "¡Derrotaste al Gólem y a Medusa! Aplicaste a la perfección la doble terapia en úlcera péptica (Glacius + Grapa bajo pH neutro) y la ligadura selectiva de várices tras descompresión con Terlipresina.");
+                return;
+            }
+
+            // Derrota sólo si la vida llega exactamente a cero
             if (bioState.hp <= 0) {
-                endGame(false, "SHOCK HIPOVOLÉMICO FATAL", "El sangrado masivo no contenido agotó la hemoglobina y reserva del héroe.");
+                endGame(false, "SHOCK HIPOVOLÉMICO FATAL", "El sangrado no contenido agotó la hemoglobina. Recuerda usar [R] para transfundir cuando la vida caiga bajo el 70%.");
                 return;
             }
 
@@ -515,38 +557,34 @@
                 m.x += m.vx;
                 if (m.x < m.minX || m.x > m.maxX) m.vx *= -1;
 
-                // Colisión con Héroe
                 if (checkOverlap(hero, m)) {
-                    heroTakeDamage(12, "¡QUEMADURA DE PEPSINA CORROSIVA!");
+                    heroTakeDamage(10, "¡QUEMADURA DE PEPSINA!");
                     hero.vx = m.vx * 3;
-                    hero.vy = -6;
+                    hero.vy = -5;
                 }
             });
 
-            // 3. Comportamiento de los Titanes (Jefes)
+            // 3. Comportamiento de los Titanes (Gólem y Medusa)
             bosses.forEach(b => {
                 if (b.defeated) return;
 
                 b.attackTimer++;
 
-                // El Titán Úlcera dispara chorros de lava/sangre a presión
+                // El Gólem Úlcera lanza ráfagas de fuego arterial si no está congelado
                 if (b.type === 'ulcer' && !b.frozen) {
-                    if (b.attackTimer % 90 === 0) {
-                        spawnParticles(b.x + 35, b.y + 20, '#ef4444', 16);
-                        // Si el héroe está cerca, le causa daño por hematemesis activa
-                        if (Math.hypot((hero.x + 14) - (b.x + 35), (hero.y + 20) - (b.y + 40)) < 260) {
-                            heroTakeDamage(8, "¡GOLPE DE CHORRO ARTERIAL A PRESIÓN!");
-                        }
+                    if (b.attackTimer % 110 === 0) {
+                        let dir = hero.x < b.x ? -1 : 1;
+                        spawnEnemyProjectile(b.x + b.w/2, b.y + 30, dir * 5.5, (Math.random() - 0.5) * 2, '#ef4444');
+                        spawnParticles(b.x + b.w/2, b.y + 30, '#ef4444', 12);
                     }
                 }
 
-                // El Titán Várice pulsa violentamente si no tiene bypass
-                if (b.type === 'varice') {
-                    if (b.attackTimer % 80 === 0 && !bioState.bypassActive) {
-                        spawnParticles(b.x + 40, b.y + 30, '#991b1b', 14);
-                        if (Math.hypot((hero.x + 14) - (b.x + 40), (hero.y + 20) - (b.y + 45)) < 240) {
-                            heroTakeDamage(10, "¡ONDA DE CHOQUE POR HIPERTENSIÓN PORTAL!");
-                        }
+                // Medusa Várice lanza ondas de hipertensión portal si no tiene bypass
+                if (b.type === 'varice' && !bioState.bypassActive) {
+                    if (b.attackTimer % 95 === 0) {
+                        let dir = hero.x < b.x ? -1 : 1;
+                        spawnEnemyProjectile(b.x + b.w/2, b.y + 40, dir * 6, -1.5, '#c084fc');
+                        spawnParticles(b.x + b.w/2, b.y + 40, '#a855f7', 15);
                     }
                 }
 
@@ -556,33 +594,46 @@
                 }
             });
 
-            // 4. Proyectiles del Héroe
+            // 4. Proyectiles Enemigos impactan al Héroe
+            for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
+                let ep = enemyProjectiles[i];
+                ep.x += ep.vx;
+                ep.y += ep.vy;
+                ep.life--;
+
+                if (ep.x > hero.x && ep.x < hero.x + hero.width && ep.y > hero.y && ep.y < hero.y + hero.height) {
+                    heroTakeDamage(12, "¡IMPACTO DE SANGRADO A PRESIÓN!");
+                    ep.life = 0;
+                }
+
+                if (ep.life <= 0) enemyProjectiles.splice(i, 1);
+            }
+
+            // 5. Proyectiles del Héroe
             for (let i = spells.length - 1; i >= 0; i--) {
                 let p = spells[i];
                 p.x += p.vx;
                 p.y += p.vy;
                 p.life--;
 
-                // Impacto con esbirros de pepsina
+                // Impacto con esbirros de Pepsina
                 minions.forEach((m, mIdx) => {
                     if (p.x > m.x && p.x < m.x + m.w && p.y > m.y && p.y < m.y + m.h) {
-                        // COHERENCIA FISIOPATOLÓGICA:
-                        // La pepsina SOLO se destruye/inactiva con ALCALIUM [1] (IBP elevando pH > 6.0)
-                        if (p.type === 1) { // ALCALIUM / IBP
+                        if (p.type === 1) { // ALCALIUM / IBP [Q]
                             spawnParticles(m.x + m.w/2, m.y + m.h/2, '#fde047', 22);
                             spawnFloatText(m.x, m.y - 15, "¡PEPSINA INACTIVADA! (pH > 6.0)", "#34d399");
                             minions.splice(mIdx, 1);
                             bioState.ph = Math.min(7.0, bioState.ph + 1.6);
-                        } else if (p.type === 2) { // Glacius / Adrenalina
+                        } else if (p.type === 2) { // Glacius [W]
                             spawnParticles(m.x + m.w/2, m.y + m.h/2, '#38bdf8', 8);
-                            spawnFloatText(m.x, m.y - 15, "¡INEFECTIVO! La pepsina sigue activa en frío", "#38bdf8");
-                            m.vx *= 0.5; // Solo la ralentiza
-                        } else if (p.type === 3) { // Grapa / Clip
+                            spawnFloatText(m.x, m.y - 15, "¡Inmune! La pepsina resiste el frío", "#38bdf8");
+                            m.vx *= 0.5;
+                        } else if (p.type === 3) { // Grapa [E]
                             spawnParticles(m.x + m.w/2, m.y + m.h/2, '#ef4444', 8);
-                            spawnFloatText(m.x, m.y - 15, "¡REBOTE! No puedes grapar una enzima líquida. Usa [1] ALCALIUM", "#f87171");
+                            spawnFloatText(m.x, m.y - 15, "¡REBOTE! No puedes grapar líquido. Usa [Q] ALCALIUM", "#f87171");
                         } else {
                             spawnParticles(m.x + m.w/2, m.y + m.h/2, '#94a3b8', 6);
-                            spawnFloatText(m.x, m.y - 15, "Inmune. Requiere [1] ALCALIUM", "#94a3b8");
+                            spawnFloatText(m.x, m.y - 15, "Inmune. Usa [Q] ALCALIUM", "#94a3b8");
                         }
                         p.life = 0;
                     }
@@ -599,7 +650,7 @@
                 if (p.life <= 0) spells.splice(i, 1);
             }
 
-            // 5. Partículas y Textos
+            // 6. Partículas y Textos Flotantes
             for (let i = fxParticles.length - 1; i >= 0; i--) {
                 let pt = fxParticles[i];
                 pt.x += pt.vx;
@@ -615,98 +666,89 @@
                 if (ft.life <= 0) floatTexts.splice(i, 1);
             }
 
-            // 6. Condición de Victoria
-            if (bosses.every(b => b.defeated) && bioState.hp >= 60) {
-                endGame(true, "¡MAZMORRA DE TREITZ CONQUISTADA!", 
-                    "Has derrotado a ambos Titanes aplicando la secuencia hemostática correcta: doble terapia mecánica bajo pH neutralizado y ligadura selectiva bajo control hemodinámico.");
-                return;
-            }
-
             updateHud();
         }
 
-        // Lógica de Hechizos contra los Jefes (Reglas de HDA)
+        // Fisiopatología de Hechizos contra los Jefes
         function handleBossSpellHit(boss, spellType) {
-            // CASO 1: TITÁN ÚLCERA PÉPTICA
+            // GÓLEM ÚLCERA PÉPTICA
             if (boss.type === 'ulcer') {
-                if (spellType === 1) { // Alcalium / IBP
+                if (spellType === 1) { // [Q] Alcalium / IBP
                     bioState.ph = 6.8;
-                    spawnFloatText(boss.x, boss.y - 25, "¡PH NEUTRALIZADO A 6.8! Pepsina inhibida, coágulo protegido", "#fde047");
+                    spawnFloatText(boss.x, boss.y - 25, "¡PH ELEVADO A 6.8! Pepsina inhibida", "#fde047");
                     spawnParticles(boss.x + 35, boss.y + 40, '#fde047', 25);
                     return;
                 }
 
-                if (spellType === 2) { // Glacius / Adrenalina
+                if (spellType === 2) { // [W] Glacius / Adrenalina
                     boss.frozen = true;
-                    boss.frozenTimer = 300; // 5 segundos congelado
-                    spawnFloatText(boss.x, boss.y - 25, "¡CONGELADO! Chorro arterial frenado (Adrenalina 1:10.000)", "#38bdf8");
+                    boss.frozenTimer = 350;
+                    spawnFloatText(boss.x, boss.y - 25, "¡CHORRO CONGELADO! (Adrenalina 1:10.000)", "#38bdf8");
                     spawnParticles(boss.x + 35, boss.y + 40, '#38bdf8', 25);
                     return;
                 }
 
-                if (spellType === 3) { // Grapa de Titanio / Endoclip
-                    // Regla de Oro: Si pH < 6.0, el ácido derrite la grapa
+                if (spellType === 3) { // [E] Grapa / Endoclip
                     if (bioState.ph < 6.0) {
-                        spawnFloatText(boss.x, boss.y - 30, "¡FALLO!: El pH ácido (2.0) disolvió la grapa. ¡Dispara [1] ALCALIUM primero!", "#ef4444");
-                        spawnParticles(boss.x + 35, boss.y + 40, '#ef4444', 18);
+                        spawnFloatText(boss.x, boss.y - 30, "¡FALLO!: El pH ácido disolvió la grapa. ¡Dispara primero [Q] ALCALIUM!", "#ef4444");
+                        spawnParticles(boss.x + 35, boss.y + 40, '#ef4444', 20);
                         return;
                     }
 
+                    boss.defeated = true;
                     if (boss.frozen) {
-                        boss.defeated = true;
-                        spawnFloatText(boss.x, boss.y - 30, "¡DOBLE TERAPIA PERFECTA! Crio + Grapa (Forrest III sellado)", "#34d399");
-                        spawnParticles(boss.x + 35, boss.y + 40, '#22c55e', 35);
+                        spawnFloatText(boss.x, boss.y - 30, "¡DOBLE TERAPIA COMPLETA! Crio + Grapa (Gólem Sellado)", "#34d399");
+                        spawnParticles(boss.x + 35, boss.y + 40, '#22c55e', 40);
                     } else {
-                        boss.defeated = true;
-                        spawnFloatText(boss.x, boss.y - 30, "¡Grapa fijada! Úlcera contenida", "#eab308");
+                        spawnFloatText(boss.x, boss.y - 30, "¡Grapa fijada! Úlcera sellada", "#eab308");
                         spawnParticles(boss.x + 35, boss.y + 40, '#eab308', 25);
                     }
                     return;
                 }
 
-                if (spellType === 4) { // Anillo / Banda
-                    spawnFloatText(boss.x, boss.y - 25, "¡INEFICAZ! El anillo no puede estrangular un cráter plano", "#fbbf24");
+                if (spellType === 4) { // [S] Banda
+                    spawnFloatText(boss.x, boss.y - 25, "¡INEFICAZ! La banda no puede ligar un cráter ulceroso plano", "#fbbf24");
                     return;
                 }
 
-                if (spellType === 5) { // Runa Bypass / Terlipresina
-                    spawnFloatText(boss.x, boss.y - 25, "¡ERROR! Terlipresina no tiene efecto hemostático en úlcera arterial", "#f87171");
+                if (spellType === 5) { // [A] Terlipresina
+                    spawnFloatText(boss.x, boss.y - 25, "¡SIN EFECTO! Terlipresina no detiene sangrado arterial", "#f87171");
                     return;
                 }
             }
 
-            // CASO 2: TITÁN VÁRICE PORTAL
+            // MEDUSA VÁRICE PORTAL
             if (boss.type === 'varice') {
-                if (spellType === 5) { // Runa Bypass / Terlipresina
+                if (spellType === 5) { // [A] Runa Bypass / Terlipresina
                     bioState.bypassActive = true;
-                    bioState.bypassTime = 400; // ~6.5 segundos
-                    spawnFloatText(boss.x, boss.y - 30, "¡DESCOMPRESIÓN V1! Flujo portal reducido al 40% (Terlipresina)", "#c084fc");
+                    bioState.bypassTime = 420;
+                    spawnFloatText(boss.x, boss.y - 30, "¡DESCOMPRESIÓN V1! Flujo portal reducido (Terlipresina)", "#c084fc");
                     spawnParticles(boss.x + 40, boss.y + 45, '#c084fc', 30);
                     return;
                 }
 
-                if (spellType === 2) { // Adrenalina en Várice = IATROGENIA
-                    spawnFloatText(boss.x, boss.y - 35, "¡DETONACIÓN! El choque criogénico reventó la pared venosa delgada", "#ef4444");
+                if (spellType === 2) { // [W] Glacius en Várice = IATROGENIA
+                    spawnFloatText(boss.x, boss.y - 35, "¡DETONACIÓN! Inyectar en várice desgarra la adventicia venosa", "#ef4444");
                     spawnParticles(boss.x + 40, boss.y + 45, '#ef4444', 35);
                     heroTakeDamage(25, "¡EXPLOSIÓN VENOSA POR ADRENALINA EN VÁRICE!");
                     return;
                 }
 
-                if (spellType === 3) { // Grapa en Várice = ERROR
-                    spawnFloatText(boss.x, boss.y - 25, "¡RECHAZO! Las grapas cortantes desgarran las várices", "#fbbf24");
+                if (spellType === 3) { // [E] Grapa en Várice = ERROR
+                    spawnFloatText(boss.x, boss.y - 25, "¡RECHAZO! Los clips metálicos cortan y desgarran várices", "#fbbf24");
                     return;
                 }
 
-                if (spellType === 4) { // Anillo Estrangulador / Banda
+                if (spellType === 4) { // [S] Anillo Banda
                     if (!bioState.bypassActive) {
-                        spawnFloatText(boss.x, boss.y - 25, "¡FALLO! La alta tensión portal desprendió el anillo. Dispara primero [5] RUNA BYPASS.", "#f97316");
+                        spawnFloatText(boss.x, boss.y - 25, "¡FALLO! La hipertensión portal expulsó la banda. Dispara primero [A] RUNA BYPASS.", "#f97316");
                         return;
                     }
 
                     boss.defeated = true;
                     boss.banded = true;
-                    spawnFloatText(boss.x, boss.y - 30, "¡ESTRANGULACIÓN PERFECTA! Várice ligada con banda elástica", "#34d399");
-                    spawnParticles(boss.x + 40, boss.y + 45, '#34d399', 40);
+                    spawnFloatText(boss.x, boss.y - 30, "¡LIGADURA PERFECTA! Várice estrangulada (Medusa Sellada)", "#34d399");
+                    spawnParticles(boss.x + 40, boss.y + 45, '#34d399', 45);
                     return;
                 }
             }
@@ -769,10 +811,9 @@
             ctx.fillRect(cameraX, 0, canvas.width, canvas.height);
 
             // Columnas y antorchas en el fondo
-            for (let i = 0; i < 2400; i += 280) {
+            for (let i = 0; i < 2600; i += 280) {
                 ctx.fillStyle = '#0f172a';
                 ctx.fillRect(i, 40, 45, 400);
-                // Antorcha mágica
                 ctx.fillStyle = '#f59e0b';
                 ctx.beginPath();
                 ctx.arc(i + 22, 160, 6 + Math.sin(Date.now() * 0.01 + i) * 2, 0, Math.PI * 2);
@@ -787,12 +828,11 @@
                 ctx.lineWidth = 2;
                 ctx.strokeRect(p.x, p.y, p.w, p.h);
 
-                // Borde superior brillante
                 ctx.fillStyle = '#60a5fa';
                 ctx.fillRect(p.x, p.y, p.w, 3);
             });
 
-            // Esbirros de Pepsina (Monstruos tipo Goomba / Babosas)
+            // Esbirros de Pepsina
             minions.forEach(m => {
                 ctx.fillStyle = '#10b981';
                 ctx.beginPath();
@@ -802,19 +842,16 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // Ojos
                 ctx.fillStyle = '#000';
-                ctx.fillRect(m.x + (m.vx > 0 ? 16 : 6), m.y + 8, 4, 4);
+                ctx.fillRect(m.x + (m.vx > 0 ? 18 : 6), m.y + 8, 4, 4);
 
-                // Texto sobre el esbirro
                 ctx.fillStyle = '#a7f3d0';
                 ctx.font = 'bold 9px monospace';
                 ctx.fillText("PEPSINA", m.x - 4, m.y - 6);
             });
 
-            // Titanes (Jefes de Acción)
+            // Titanes (Gólem y Medusa)
             bosses.forEach(b => {
-                // Color y forma del Jefe
                 if (b.type === 'ulcer') {
                     ctx.fillStyle = b.defeated ? '#15803d' : (b.frozen ? '#0284c7' : '#b91c1c');
                     ctx.fillRect(b.x, b.y, b.w, b.h);
@@ -822,7 +859,6 @@
                     ctx.lineWidth = 3;
                     ctx.strokeRect(b.x, b.y, b.w, b.h);
 
-                    // Chorro de fuego/sangre superior si está activo
                     if (!b.defeated && !b.frozen) {
                         ctx.fillStyle = '#ef4444';
                         ctx.beginPath();
@@ -847,36 +883,35 @@
                     }
                 }
 
-                // Cartela de Jefe
                 ctx.fillStyle = '#f8fafc';
                 ctx.font = 'bold 11px monospace';
                 ctx.textAlign = 'center';
                 ctx.fillText(b.name, b.x + b.w/2, b.y - 12);
-                ctx.fillText(b.defeated ? "[DERROTADO]" : (b.frozen ? "[CONGELADO - ¡CLAVA LA GRAPA!]" : "[FUEGO ACTIVO]"), b.x + b.w/2, b.y + b.h + 18);
+                ctx.fillText(b.defeated ? "[SELLADO EXITOSO]" : (b.frozen ? "[CONGELADO - ¡DISPARA [E] GRAPA!]" : "[ACTIVO]"), b.x + b.w/2, b.y + b.h + 18);
             });
 
-            // Proyectiles Mágicos
+            // Proyectiles del Héroe
             spells.forEach(p => {
                 ctx.save();
                 ctx.translate(p.x, p.y);
-                if (p.type === 1) { // Alcalium (IBP)
+                if (p.type === 1) { // Alcalium [Q]
                     ctx.fillStyle = '#fde047';
                     ctx.shadowColor = '#fde047';
                     ctx.shadowBlur = 10;
                     ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.fill();
-                } else if (p.type === 2) { // Glacius (Adrenalina)
+                } else if (p.type === 2) { // Glacius [W]
                     ctx.fillStyle = '#38bdf8';
                     ctx.shadowColor = '#38bdf8';
                     ctx.shadowBlur = 8;
                     ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI * 2); ctx.fill();
-                } else if (p.type === 3) { // Grapa (Clip)
+                } else if (p.type === 3) { // Grapa [E]
                     ctx.fillStyle = '#cbd5e1';
                     ctx.fillRect(-8, -4, 16, 8);
-                } else if (p.type === 4) { // Anillo (Banda)
+                } else if (p.type === 4) { // Anillo [S]
                     ctx.strokeStyle = '#f97316';
                     ctx.lineWidth = 4;
                     ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.stroke();
-                } else if (p.type === 5) { // Runa Bypass (Terlipresina)
+                } else if (p.type === 5) { // Runa Bypass [A]
                     ctx.fillStyle = '#c084fc';
                     ctx.shadowColor = '#c084fc';
                     ctx.shadowBlur = 10;
@@ -885,11 +920,19 @@
                 ctx.restore();
             });
 
-            // EL HÉROE (Estilo Hechicero / Super Mario)
+            // Proyectiles Enemigos
+            enemyProjectiles.forEach(ep => {
+                ctx.fillStyle = ep.color;
+                ctx.beginPath();
+                ctx.arc(ep.x, ep.y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // EL HÉROE (Estilo Super Mario con Túnica / Varita horizontal)
             ctx.save();
             ctx.translate(hero.x, hero.y);
 
-            // Túnica / Cuerpo
+            // Túnica
             ctx.fillStyle = '#2563eb';
             ctx.fillRect(4, 14, hero.width - 8, hero.height - 14);
 
@@ -897,7 +940,7 @@
             ctx.fillStyle = '#fed7aa';
             ctx.fillRect(6, 4, hero.width - 12, 12);
 
-            // Sombrero puntiagudo de Hechicero (Harry Potter)
+            // Sombrero puntiagudo
             ctx.fillStyle = '#1e3a8a';
             ctx.beginPath();
             ctx.moveTo(2, 6);
@@ -909,19 +952,16 @@
             ctx.fillStyle = '#000';
             ctx.fillRect(hero.facingRight ? hero.width - 10 : 8, 8, 3, 3);
 
-            // Varita Mágica apuntando al cursor
-            ctx.save();
-            ctx.translate(14, 18);
-            ctx.rotate(hero.aimAngle);
+            // Varita Mágica apuntando al frente de forma fija (como Mario)
             ctx.fillStyle = '#92400e';
-            ctx.fillRect(4, -2, 18, 4);
-            // Punta brillante de la varita
-            let wandColor = activeSpell === 2 ? '#38bdf8' : (activeSpell === 3 ? '#eab308' : (activeSpell === 4 ? '#f97316' : '#fde047'));
-            ctx.fillStyle = wandColor;
+            let wandX = hero.facingRight ? hero.width - 4 : -14;
+            ctx.fillRect(wandX, 16, 18, 4);
+
+            // Punta mágica
+            ctx.fillStyle = '#38bdf8';
             ctx.beginPath();
-            ctx.arc(22, 0, 4, 0, Math.PI * 2);
+            ctx.arc(hero.facingRight ? wandX + 18 : wandX, 18, 4, 0, Math.PI * 2);
             ctx.fill();
-            ctx.restore();
 
             // Pies
             ctx.fillStyle = '#1e293b';
@@ -963,10 +1003,11 @@
             reasonEl.textContent = feedback;
 
             fbEl.innerHTML = `
-                <strong style="color: #fbbf24;">LECCIONES CLÍNICAS DE LA MAZMORRA DE TREITZ:</strong><br>
-                • <strong>Pepsina y pH ácido (&lt;6.0):</strong> En medio ácido, la pepsina degrada el coágulo y desprende los clips mecánicos; el IBP en bolo es obligatorio.<br>
-                • <strong>Úlcera Péptica (Forrest Ia):</strong> La doble terapia combina infiltración (adrenalina) para frenar el chorro y endoclip mecánico definitivo.<br>
-                • <strong>Várices Esofágicas:</strong> ¡La adrenalina está contraindicada porque perfora la pared venosa! Requiere Terlipresina (vasoconstrictor esplácnico V1) y Ligadura con Bandas.
+                <strong style="color: #fbbf24;">PRINCIPIOS CLÍNICOS DEMOSTRADOS EN EL JUEGO:</strong><br>
+                • <strong>Pepsina y pH (&lt;6.0):</strong> En medio ácido, la pepsina degrada el coágulo y lisa la fibrina; el IBP ([Q] ALCALIUM) es obligatorio para que los sellos mecánicos no se disuelvan.<br>
+                • <strong>Úlcera Forrest Ia (Gólem):</strong> Doble terapia obligatoria: vasoconstricción inicial ([W] GLACIUS) + sellado mecánico definitivo ([E] GRAPA).<br>
+                • <strong>Várices Esofágicas (Medusa):</strong> Descompresión esplácnica V1 ([A] RUNA BYPASS / Terlipresina) y ligadura mecánica ([S] ANILLO BANDA). ¡Adrenalina y grapas rompen la pared venosa!<br>
+                • <strong>Transfusión Restrictiva (Gatillo Villanueva - [R]):</strong> Transfundir sólo con Hb &lt; 7.0 g/dL. La sobretransfusión eleva la presión portal y desencadena resangrado.
             `;
 
             screen.classList.remove('hidden');
