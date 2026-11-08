@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT TREITZ: Subterra Core Repair</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #030712;
+            color: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+
+        #game-wrapper {
+            position: relative;
+            width: 900px;
+            max-width: 98vw;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            box-shadow: 0 0 40px rgba(14, 165, 233, 0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .hud-top {
+            background: #090d16;
+            border-bottom: 2px solid #1e293b;
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+        .core-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 900;
+            color: #38bdf8;
+            letter-spacing: 1px;
+        }
+        .pulse-light {
+            width: 10px; height: 10px; border-radius: 50%; background: #38bdf8;
+            box-shadow: 0 0 10px #38bdf8; animation: blink 0.8s infinite alternate;
+        }
+        @keyframes blink { from { opacity: 0.2; } to { opacity: 1; } }
+
+        /* Canvas Arena */
+        #viewport-container {
+            position: relative;
+            width: 100%;
+            height: 480px;
+            background: #020617;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            background: #000;
+        }
+
+        /* Bottom Controls */
+        .hud-bottom {
+            background: #090d16;
+            border-top: 2px solid #1e293b;
+            padding: 10px 14px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 12px;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .btn-core {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            padding: 8px 6px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .btn-core:hover {
+            background: #334155;
+            border-color: #64748b;
+            transform: translateY(-1px);
+        }
+        .btn-core:active { transform: translateY(1px); }
+        .btn-core span { font-size: 0.62rem; color: #94a3b8; font-weight: normal; }
+        .btn-core kbd {
+            align-self: flex-end;
+            background: #020617;
+            border: 1px solid #475569;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 0.6rem;
+            color: #38bdf8;
+        }
+
+        /* Module Diagnostics */
+        .diag-box {
+            background: #020617;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 6px 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 0.7rem;
+        }
+        .diag-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+        }
+        .val-good { color: #34d399; font-weight: bold; }
+        .val-warn { color: #fbbf24; font-weight: bold; }
+        .val-bad { color: #f87171; font-weight: bold; }
+
+        /* Overlay Messages */
+        .screen-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.92);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            text-align: center;
+            z-index: 20;
+        }
+        .hidden { display: none !important; }
+
+        .btn-start {
+            margin-top: 18px;
+            background: #0284c7;
+            color: white;
+            font-weight: 900;
+            padding: 10px 24px;
+            border: 1px solid #38bdf8;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .btn-start:hover {
+            background: #0369a1;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.7);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-wrapper" class="mono">
+        <!-- HUD Header -->
+        <div class="hud-top">
+            <div class="core-badge">
+                <div class="pulse-light" id="core-light"></div>
+                PROJECT TREITZ // CORE MONITOR
+            </div>
+            <div style="display: flex; gap: 16px; font-size: 0.8rem;">
+                <div>NIVEL: <span id="level-display" style="color: #fbbf24; font-weight: bold;">SECTOR 1</span></div>
+                <div>INTEGRIDAD: <span id="integrity-display" class="val-good">100%</span></div>
+                <div>TIEMPO SOBREVIVENCIA: <span id="time-display" style="color: #38bdf8;">00:00</span></div>
+            </div>
+        </div>
+
+        <!-- Canvas Principal -->
+        <div id="viewport-container">
+            <canvas id="coreCanvas" width="900" height="480"></canvas>
+
+            <!-- Pantalla Inicio -->
+            <div id="start-screen" class="screen-overlay">
+                <h1 style="color: #38bdf8; font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 8px;">SUBTERRA CORE: PROTOCOLO TREITZ</h1>
+                <p style="max-width: 650px; font-size: 0.82rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 12px; font-family: sans-serif;">
+                    Eres el ingeniero de soporte en una estación sumergida. Una falla hidráulica de alta energía ha fracturado las tuberías aguas arriba de la <strong>Válvula Treitz</strong>.<br><br>
+                    Para evitar la implosión del submarino, debes navegar con tu robot de mantenimiento (<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> o Flechas) y sellar las fisuras disparando herramientas con <kbd>CLIC</kbd>.<br>
+                    Simultáneamente, deberás modular las presiones de la central mediante comandos de consola (<kbd>1</kbd> a <kbd>6</kbd>).
+                </p>
+                <div style="background: #020617; border: 1px solid #1e293b; padding: 10px; border-radius: 8px; font-size: 0.75rem; text-align: left; max-width: 600px;">
+                    <div style="color: #fbbf24; font-weight: bold; margin-bottom: 4px;">REGLAS CRÍTICAS DE FÍSICA HIDRÁULICA:</div>
+                    • Si el pH del refrigerante es ácido (&lt;6.0), la mezcla disolverá cualquier parche mecánico.<br>
+                    • No sobrecargues la batería (&gt;80%): el aumento masivo de presión en la red reventará los sellos débiles.<br>
+                    • Identifica el tipo de falla: no inyectes criospray en colectores de alta tensión portal o causará detonación.
+                </div>
+                <button class="btn-start" onclick="startGame()">INICIAR PROTOCOLO DE REPARACIÓN</button>
+            </div>
+
+            <!-- Pantalla Fin de Partida / Retroalimentación -->
+            <div id="gameover-screen" class="screen-overlay hidden">
+                <h2 id="over-title" style="color: #f87171; font-size: 1.6rem; margin-bottom: 8px;">FALLA CATASTRÓFICA DEL NÚCLEO</h2>
+                <div id="over-reason" style="font-size: 0.85rem; color: #cbd5e1; max-width: 600px; line-height: 1.5; font-family: sans-serif; margin-bottom: 15px;"></div>
+                <div id="over-debrief" style="background: #020617; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; font-size: 0.74rem; text-align: left; max-width: 620px; color: #94a3b8; font-family: sans-serif;"></div>
+                <button class="btn-start" onclick="restartGame()">REINTENTAR SIMULACIÓN</button>
+            </div>
+        </div>
+
+        <!-- Consola de Control de Sistemas (Acciones) -->
+        <div class="hud-bottom">
+            <div class="action-grid">
+                <!-- 1: Ventilador de Emergencia -->
+                <button class="btn-core" onclick="triggerSystem(1)">
+                    <div>PURGA DE FLUJO<br><span>Evita inundación de turbina</span></div>
+                    <kbd>[1]</kbd>
+                </button>
+                <!-- 2: Despresurizador / Cristaloides -->
+                <button class="btn-core" onclick="triggerSystem(2)">
+                    <div>INYECCIÓN FLUIDO AUX<br><span>Subir presión si cae de 65 PSI</span></div>
+                    <kbd>[2]</kbd>
+                </button>
+                <!-- 3: Batería / Transfusión -->
+                <button class="btn-core" onclick="triggerSystem(3)">
+                    <div>RECARGA DE CELDAS<br><span>Meta restrictiva: 70-80%</span></div>
+                    <kbd>[3]</kbd>
+                </button>
+                <!-- 4: Neutralizador Alcalino -->
+                <button class="btn-core" onclick="triggerSystem(4)">
+                    <div>NEUTRALIZADOR ALCALINO<br><span>Elevar pH del refrigerante &gt;6.0</span></div>
+                    <kbd>[4]</kbd>
+                </button>
+                <!-- 5: Reductor de Colector Auxiliar -->
+                <button class="btn-core" onclick="triggerSystem(5)">
+                    <div>VALVULA BYPASS COLECTOR<br><span>Frena fuga en colector portal</span></div>
+                    <kbd>[5]</kbd>
+                </button>
+                <!-- 6: Taponamiento Balón -->
+                <button class="btn-core" onclick="triggerSystem(6)">
+                    <div>SELLO NEUMÁTICO GLOBAL<br><span>Bloqueo temporal de emergencia</span></div>
+                    <kbd>[6]</kbd>
+                </button>
+            </div>
+
+            <!-- Panel de Telemetría (Parámetros Fisiopatológicos Cifrados) -->
+            <div class="diag-box">
+                <div style="font-weight: bold; color: #94a3b8; border-bottom: 1px solid #1e293b; padding-bottom: 3px; margin-bottom: 4px; font-size: 0.65rem;">
+                    TELEMETRÍA HIDRÁULICA Y FÍSICO-QUÍMICA
+                </div>
+                <div class="diag-row">
+                    <span>Presión Hidráulica Central:</span>
+                    <span id="tel-pressure" class="val-warn">58 PSI [Meta ≥65]</span>
+                </div>
+                <div class="diag-row">
+                    <span>Celdas de Potencia (Energía):</span>
+                    <span id="tel-battery" class="val-bad">62% [Meta 70-80%]</span>
+                </div>
+                <div class="diag-row">
+                    <span>pH Solución Refrigerante:</span>
+                    <span id="tel-ph" class="val-bad">2.2 [Ácido corrosivo]</span>
+                </div>
+                <div class="diag-row">
+                    <span>Nivel Inundación Cámara:</span>
+                    <span id="tel-flood" class="val-good">35%</span>
+                </div>
+                <div class="diag-row">
+                    <span>Ducto Aire / Turbina:</span>
+                    <span id="tel-turbine" class="val-good">DESPEJADO</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('coreCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Estado del Juego
+        let isRunning = false;
+        let gameTime = 0;
+        let gameLoopId = null;
+
+        // Fisiopatología Mecanizada en Sistemas
+        const coreState = {
+            pressure: 56,        // Presión hidrostática / PAM (Meta: 65 - 80)
+            battery: 64,         // Hemoglobina (%) - Meta restrictiva: 70 - 80%
+            ph: 2.2,             // pH gástrico (debe ser > 6.0 para que pegue el sello)
+            flooding: 30,        // Nivel de líquido en cámara (Stomach Blood)
+            turbineProtected: false, // Intubación / Vía aérea
+            bypassActive: false, // Terlipresina (frena fuga en colector portal)
+            bypassTimer: 0,
+            pneumaticSeal: false,// Balón de Sengstaken
+            integrity: 100
+        };
+
+        // Entidad Jugador: Drone de Mantenimiento
+        const drone = {
+            x: 450,
+            y: 380,
+            vx: 0,
+            vy: 0,
+            speed: 4.5,
+            radius: 14,
+            currentTool: 'grapa', // 'crio' (adrenalina), 'grapa' (endoclip), 'anillo' (bandas)
+            aimAngle: 0
+        };
+
+        // Proyectiles / Herramientas disparadas
+        let toolProjectiles = [];
+
+        // Fisuras en tuberías (Focos de Sangrado)
+        // Tipo 'erosion' = Úlcera (requiere crio + grapa)
+        // Tipo 'colector' = Várice de alta presión (requiere bypass + anillo)
+        let fissures = [];
+
+        // Partículas de fuga
+        let jetParticles = [];
+
+        // Teclado
+        const keys = {};
+
+        window.addEventListener('keydown', e => {
+            keys[e.key.toLowerCase()] = true;
+            if (e.key >= '1' && e.key <= '6') {
+                triggerSystem(parseInt(e.key));
+            }
+            if (e.key.toLowerCase() === 'q') cycleTool();
+        });
+
+        window.addEventListener('keyup', e => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            drone.aimAngle = Math.atan2(mouseY - drone.y, mouseX - drone.x);
+        });
+
+        canvas.addEventListener('mousedown', e => {
+            if (!isRunning) return;
+            fireTool();
+        });
+
+        function cycleTool() {
+            const tools = ['grapa', 'crio', 'anillo'];
+            let nextIdx = (tools.indexOf(drone.currentTool) + 1) % tools.length;
+            drone.currentTool = tools[nextIdx];
+        }
+
+        function fireTool() {
+            const speed = 9;
+            toolProjectiles.push({
+                x: drone.x,
+                y: drone.y,
+                vx: Math.cos(drone.aimAngle) * speed,
+                vy: Math.sin(drone.aimAngle) * speed,
+                type: drone.currentTool,
+                life: 60
+            });
+        }
+
+        function spawnFissures() {
+            fissures = [
+                {
+                    id: 1,
+                    x: 240,
+                    y: 140,
+                    type: 'erosion', // Equivalente a Úlcera Péptica
+                    label: "FISURA EROSIVA ALPHA",
+                    crioApplied: false,
+                    sealed: false,
+                    flowRate: 0.05
+                },
+                {
+                    id: 2,
+                    x: 660,
+                    y: 140,
+                    type: 'colector', // Equivalente a Rotura de Várices
+                    label: "COLECTOR HIPERPRESURIZADO",
+                    ringApplied: false,
+                    sealed: false,
+                    flowRate: 0.07
+                }
+            ];
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('gameover-screen').classList.add('hidden');
+            isRunning = true;
+            gameTime = 0;
+            coreState.pressure = 56;
+            coreState.battery = 63;
+            coreState.ph = 2.2;
+            coreState.flooding = 30;
+            coreState.turbineProtected = false;
+            coreState.bypassActive = false;
+            coreState.pneumaticSeal = false;
+            coreState.integrity = 100;
+            toolProjectiles = [];
+            jetParticles = [];
+            spawnFissures();
+
+            if (gameLoopId) clearInterval(gameLoopId);
+            gameLoopId = setInterval(gameTick, 1000 / 60);
+        }
+
+        function restartGame() {
+            startGame();
+        }
+
+        // Acciones de Consola Central (Modulación Fisiopatológica)
+        function triggerSystem(num) {
+            if (!isRunning) return;
+
+            switch(num) {
+                case 1: // Purga de Turbina (Asegurar Vía Aérea / IOT)
+                    coreState.turbineProtected = true;
+                    coreState.pressure = Math.max(40, coreState.pressure - 4); // Leve hipotensión pos-inducción
+                    createFloatingText("¡DUCTO HERMÉTICO SELLADO! Turbina protegida contra inundación", "#38bdf8");
+                    break;
+
+                case 2: // Inyección Auxiliar (Cristaloides - Titulación PAM)
+                    if (coreState.pressure < 65) {
+                        coreState.pressure += 9;
+                        createFloatingText("Presión restaurada (+9 PSI)", "#34d399");
+                    } else {
+                        // Penalización por hemodilución / aumento indebido de volumen
+                        coreState.battery -= 4;
+                        coreState.flooding += 6;
+                        createFloatingText("¡ALERTA!: Exceso de fluido hidráulico generó hemodilución", "#f87171");
+                    }
+                    break;
+
+                case 3: // Celdas de Potencia (Transfusión Restrictiva)
+                    // Fisiopatología de Villanueva: Solo transfundir si batería < 70%
+                    if (coreState.battery < 70) {
+                        coreState.battery += 8;
+                        createFloatingText("Celdas recargadas (+8% Energía)", "#38bdf8");
+                    } else {
+                        // Sobretransfusión: aumento de presión portal y fuga
+                        coreState.battery += 8;
+                        coreState.pressure += 6;
+                        fissures.forEach(f => { if (!f.sealed) f.flowRate *= 1.4; });
+                        createFloatingText("¡IATROGENIA!: Batería >80% incrementó la presión en las fisuras", "#f87171");
+                    }
+                    break;
+
+                case 4: // Neutralizador Alcalino (IBP en Bolo - Omeprazol)
+                    coreState.ph = 6.6;
+                    createFloatingText("pH neutralizado a 6.6 (Inhibición de corrosión ácida)", "#fde047");
+                    break;
+
+                case 5: // Válvula Bypass (Terlipresina)
+                    coreState.bypassActive = true;
+                    coreState.bypassTimer = 300; // 5 segundos de alivio
+                    createFloatingText("Bypass activado: Flujo en Colector reducido al 40%", "#c084fc");
+                    break;
+
+                case 6: // Sello Neumático (Sonda de Sengstaken)
+                    if (!coreState.turbineProtected) {
+                        endGame(false, "ASFIXIA DE TURBINA", "Intentaste desplegar el sello neumático sin proteger el ducto de aire de la turbina. El reflujo anegó el respirador.");
+                        return;
+                    }
+                    coreState.pneumaticSeal = true;
+                    fissures.forEach(f => { if (f.type === 'colector') f.sealed = true; });
+                    createFloatingText("¡SELLADO NEUMÁTICO GLOBAL DE EMERGENCIA!", "#38bdf8");
+                    break;
+            }
+        }
+
+        let floatingTexts = [];
+        function createFloatingText(txt, color) {
+            floatingTexts.push({
+                text: txt,
+                color: color,
+                x: 450,
+                y: 240,
+                alpha: 1.0,
+                life: 80
+            });
+        }
+
+        // Bucle Principal (Tick)
+        function gameTick() {
+            gameTime++;
+
+            // Movimiento del Drone
+            if (keys['w'] || keys['arrowup']) drone.vy -= 0.5;
+            if (keys['s'] || keys['arrowdown']) drone.vy += 0.5;
+            if (keys['a'] || keys['arrowleft']) drone.vx -= 0.5;
+            if (keys['d'] || keys['arrowright']) drone.vx += 0.5;
+
+            drone.vx *= 0.88;
+            drone.vy *= 0.88;
+            drone.x += drone.vx;
+            drone.y += drone.vy;
+
+            // Límites del canvas
+            drone.x = Math.max(30, Math.min(canvas.width - 30, drone.x));
+            drone.y = Math.max(80, Math.min(canvas.height - 30, drone.y));
+
+            // Actualización de Fisiopatología
+            let activeBleedRate = 0;
+            fissures.forEach(f => {
+                if (!f.sealed) {
+                    let multiplier = 1.0;
+                    if (f.type === 'colector' && coreState.bypassActive) multiplier = 0.4;
+                    if (f.type === 'erosion' && f.crioApplied) multiplier = 0.5;
+                    activeBleedRate += f.flowRate * multiplier;
+
+                    // Emitir partículas de fuga
+                    if (Math.random() < 0.6) {
+                        jetParticles.push({
+                            x: f.x,
+                            y: f.y + 10,
+                            vx: (Math.random() - 0.5) * 3,
+                            vy: Math.random() * 4 + 2,
+                            life: 40,
+                            color: f.type === 'colector' ? '#991b1b' : '#ef4444'
+                        });
+                    }
+                }
+            });
+
+            // Caída de Energía y Presión por la Fuga
+            if (activeBleedRate > 0) {
+                coreState.battery -= activeBleedRate * 0.12;
+                coreState.pressure -= activeBleedRate * 0.15;
+                coreState.flooding += activeBleedRate * 0.22;
+            } else {
+                coreState.flooding = Math.max(5, coreState.flooding - 0.08);
+            }
+
+            // Temporizador del Bypass portal
+            if (coreState.bypassActive) {
+                coreState.bypassTimer--;
+                if (coreState.bypassTimer <= 0) coreState.bypassActive = false;
+            }
+
+            // Amenaza Crítica: Inundación sin Protección de Turbina
+            if (coreState.flooding >= 85 && !coreState.turbineProtected) {
+                endGame(false, "AHOGAMIENTO DEL NÚCLEO (BRONCOASPIRACIÓN)", 
+                    "La inundación en la cámara superó el umbral de seguridad y el líquido penetró en la turbina de aire sin ducto hermético.");
+                return;
+            }
+
+            // Colapso Hidráulico
+            if (coreState.pressure < 38 || coreState.battery < 30) {
+                endGame(false, "COLAPSO TISULAR / APAGÓN DEL REACTOR", 
+                    "La presión hidráulica descendió de los niveles críticos de perfusión o las celdas de potencia se vaciaron por completo.");
+                return;
+            }
+
+            // Proyectiles
+            for (let i = toolProjectiles.length - 1; i >= 0; i--) {
+                let p = toolProjectiles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+
+                // Colisión con fisuras
+                fissures.forEach(f => {
+                    if (!f.sealed) {
+                        let dist = Math.hypot(p.x - f.x, p.y - f.y);
+                        if (dist < 35) {
+                            handleFissureInteraction(f, p.type);
+                            p.life = 0;
+                        }
+                    }
+                });
+
+                if (p.life <= 0) toolProjectiles.splice(i, 1);
+            }
+
+            // Partículas
+            for (let i = jetParticles.length - 1; i >= 0; i--) {
+                let jp = jetParticles[i];
+                jp.x += jp.vx;
+                jp.y += jp.vy;
+                jp.life--;
+                if (jp.life <= 0) jetParticles.splice(i, 1);
+            }
+
+            // Verificar Victoria
+            if (fissures.every(f => f.sealed) && coreState.pressure >= 65 && coreState.battery >= 70 && coreState.battery <= 85 && coreState.ph >= 6.0) {
+                endGame(true, "¡NÚCLEO ESTABILIZADO Y PRESURIZADO!", 
+                    "Has aplicado la secuencia hemostática correcta: control del pH ácido, modulación de flujo portal, sellado mecánico exacto y reposición restrictiva.");
+                return;
+            }
+
+            render();
+            updateTelemetry();
+        }
+
+        // Lógica de Mecanismos de Reparación (Reglas Médicas Trasvestidas)
+        function handleFissureInteraction(fissure, tool) {
+            // Regla 1: Corrosión ácida destruye el sello
+            if (coreState.ph < 6.0 && tool === 'grapa') {
+                createFloatingText("¡ERROR!: pH ácido disolvió la grapa (Inactiva la pepsina primero)", "#ef4444");
+                return;
+            }
+
+            // Caso Fisura Erosiva (Úlcera Forrest Ia)
+            if (fissure.type === 'erosion') {
+                if (tool === 'anillo') {
+                    createFloatingText("¡INEFICAZ!: El anillo elástico no puede estrangular una fisura plana", "#fbbf24");
+                    return;
+                }
+                if (tool === 'crio') {
+                    fissure.crioApplied = true;
+                    createFloatingText("Criospray aplicado: Fuga reducida transitoriamente (Vasoconstricción local)", "#38bdf8");
+                    return;
+                }
+                if (tool === 'grapa') {
+                    if (fissure.crioApplied) {
+                        fissure.sealed = true;
+                        createFloatingText("¡DOBLE SELLO PERFECTO!: Crio + Grapa mecánica. Fisura reparada", "#34d399");
+                    } else {
+                        fissure.sealed = true;
+                        createFloatingText("Grapa fijada sin enfriamiento previo. Falla contenida", "#eab308");
+                    }
+                    return;
+                }
+            }
+
+            // Caso Colector Hiperpresurizado (Várices Esofágicas)
+            if (fissure.type === 'colector') {
+                if (tool === 'crio') {
+                    // Grave iatrogenia: inyectar adrenalina en una várice
+                    fissure.flowRate *= 1.8;
+                    coreState.pressure -= 10;
+                    createFloatingText("¡DETONACIÓN!: El choque criogénico reventó la pared delgada del colector", "#ef4444");
+                    return;
+                }
+                if (tool === 'grapa') {
+                    createFloatingText("¡RECHAZO!: Las grapas desgarran el colector venoso de alta presión", "#fbbf24");
+                    return;
+                }
+                if (tool === 'anillo') {
+                    fissure.sealed = true;
+                    fissure.ringApplied = true;
+                    createFloatingText("¡ANILLO DE COMPRESIÓN FIJADO! Tensión portal estrangulada", "#34d399");
+                    return;
+                }
+            }
+        }
+
+        // Renderizado Canvas
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Fondo y Rejilla
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 40) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            // Lago de Líquido Inundante (Fondo)
+            let floodY = canvas.height - (canvas.height * (coreState.flooding / 100));
+            ctx.fillStyle = 'rgba(69, 10, 10, 0.45)';
+            ctx.fillRect(0, floodY, canvas.width, canvas.height - floodY);
+
+            // Línea de Alerta Treitz
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 6]);
+            ctx.beginPath();
+            ctx.moveTo(0, 75);
+            ctx.lineTo(canvas.width, 75);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#64748b';
+            ctx.font = '10px monospace';
+            ctx.fillText("LÍMITE HIDRÁULICO TREITZ // SECTOR DE ALTA PRESIÓN", 15, 68);
+
+            // Renderizar Tuberías y Fisuras
+            fissures.forEach(f => {
+                // Tubería
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(f.x - 45, f.y - 15, 90, 30);
+                ctx.strokeStyle = '#475569';
+                ctx.strokeRect(f.x - 45, f.y - 15, 90, 30);
+
+                // Orificio
+                ctx.beginPath();
+                ctx.arc(f.x, f.y, 16, 0, Math.PI * 2);
+                ctx.fillStyle = f.sealed ? '#065f46' : (f.type === 'colector' ? '#881337' : '#991b1b');
+                ctx.fill();
+                ctx.strokeStyle = f.sealed ? '#34d399' : '#f87171';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Cartela de Falla
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = 'bold 9px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText(f.label, f.x, f.y - 25);
+                ctx.fillText(f.sealed ? "[SELLADO OK]" : "[FUGA ACTIVA]", f.x, f.y + 32);
+
+                if (f.crioApplied && !f.sealed) {
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.beginPath();
+                    ctx.arc(f.x, f.y, 22, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            });
+
+            // Partículas de Fuga
+            jetParticles.forEach(jp => {
+                ctx.fillStyle = jp.color;
+                ctx.beginPath();
+                ctx.arc(jp.x, jp.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Proyectiles
+            toolProjectiles.forEach(p => {
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                if (p.type === 'grapa') {
+                    ctx.fillStyle = '#eab308';
+                    ctx.fillRect(-6, -3, 12, 6);
+                } else if (p.type === 'crio') {
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
+                } else if (p.type === 'anillo') {
+                    ctx.strokeStyle = '#f97316';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.stroke();
+                }
+                ctx.restore();
+            });
+
+            // Drone del Jugador
+            ctx.save();
+            ctx.translate(drone.x, drone.y);
+            ctx.rotate(drone.aimAngle);
+
+            // Cañón
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(8, -3, 16, 6);
+
+            // Chasis
+            ctx.fillStyle = '#0284c7';
+            ctx.beginPath();
+            ctx.arc(0, 0, drone.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Indicador de Herramienta cargada
+            let toolColor = drone.currentTool === 'grapa' ? '#eab308' : (drone.currentTool === 'crio' ? '#38bdf8' : '#f97316');
+            ctx.fillStyle = toolColor;
+            ctx.beginPath();
+            ctx.arc(0, 0, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+
+            // Textos Flotantes
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                let ft = floatingTexts[i];
+                ctx.fillStyle = ft.color;
+                ctx.font = 'bold 12px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText(ft.text, ft.x, ft.y);
+                ft.y -= 0.6;
+                ft.life--;
+                if (ft.life <= 0) floatingTexts.splice(i, 1);
+            }
+
+            // HUD del Drone (Herramienta activa)
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = '10px monospace';
+            ctx.textAlign = 'left';
+            ctx.fillText(`HERRAMIENTA [Q para cambiar]: ${drone.currentTool.toUpperCase()}`, 15, canvas.height - 15);
+        }
+
+        function updateTelemetry() {
+            // Actualizar HUD superior
+            let m = Math.floor(gameTime / 3600).toString().padStart(2, '0');
+            let s = Math.floor((gameTime % 3600) / 60).toString().padStart(2, '0');
+            document.getElementById('time-display').textContent = `${m}:${s}`;
+
+            // Actualizar Telemetría
+            const pEl = document.getElementById('tel-pressure');
+            pEl.textContent = `${Math.round(coreState.pressure)} PSI [Meta ≥65]`;
+            pEl.className = coreState.pressure >= 65 ? 'val-good' : 'val-bad';
+
+            const bEl = document.getElementById('tel-battery');
+            bEl.textContent = `${Math.round(coreState.battery)}% [Meta 70-80%]`;
+            bEl.className = (coreState.battery >= 70 && coreState.battery <= 85) ? 'val-good' : 'val-warn';
+
+            const phEl = document.getElementById('tel-ph');
+            phEl.textContent = `${coreState.ph.toFixed(1)} ${coreState.ph >= 6.0 ? '[Estable]' : '[Corrosivo]'}`;
+            phEl.className = coreState.ph >= 6.0 ? 'val-good' : 'val-bad';
+
+            const fEl = document.getElementById('tel-flood');
+            fEl.textContent = `${Math.round(coreState.flooding)}%`;
+            fEl.className = coreState.flooding > 70 ? 'val-bad' : 'val-good';
+
+            const tEl = document.getElementById('tel-turbine');
+            tEl.textContent = coreState.turbineProtected ? "SELLADO HERMÉTICO" : "EXPUESTO A INUNDACIÓN";
+            tEl.className = coreState.turbineProtected ? 'val-good' : 'val-bad';
+        }
+
+        function endGame(victory, title, debrief) {
+            isRunning = false;
+            if (gameLoopId) clearInterval(gameLoopId);
+
+            const screen = document.getElementById('gameover-screen');
+            const titleEl = document.getElementById('over-title');
+            const reasonEl = document.getElementById('over-reason');
+            const debriefEl = document.getElementById('over-debrief');
+
+            titleEl.textContent = title;
+            titleEl.style.color = victory ? '#34d399' : '#f87171';
+            reasonEl.textContent = debrief;
+
+            debriefEl.innerHTML = `
+                <strong style="color: #fbbf24;">DEBRIEFING TÉCNICO (TRADUCCIÓN CLÍNICA):</strong><br>
+                • <strong>Presión Hidráulica = PAM:</strong> Los órganos nobles se apagan bajo 65 mmHg; resucitar con bolos prudentes.<br>
+                • <strong>Batería = Estrategia Transfusional:</strong> Subir de 80% (Hb >8 g/dL) eleva la presión transmural y desaloja el trombo.<br>
+                • <strong>pH del Refrigerante = Estabilidad del Coágulo:</strong> La pepsina gástrica disuelve el tapón plaquetario a pH <6.0 (el IBP es mandatorio).<br>
+                • <strong>Turbina = Vía Aérea:</strong> La aspiración hemática masiva es letal si no se aísla con IOT antes del procedimiento.
+            `;
+
+            screen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
