@@ -329,24 +329,10 @@
                     else card.classList.remove('spell-active');
                 }
             }
-
-            // Hechizos de activación directa sin proyectil:
-            if (id === 1) { // Alcalium / Omeprazol
-                bioState.ph = 6.8;
-                spawnFloatText(hero.x, hero.y - 30, "¡AURA ALCALINA! pH neutralizado a 6.8 (Inhibe corrosión)", "#fde047");
-                spawnParticles(hero.x + 14, hero.y + 20, "#fde047", 25);
-            } else if (id === 5) { // Runa Bypass / Terlipresina
-                bioState.bypassActive = true;
-                bioState.bypassTime = 400; // ~6.5 segundos
-                spawnFloatText(hero.x, hero.y - 30, "¡RUNA BYPASS ACTIVADA! Flujo venoso portal reducido al 40%", "#c084fc");
-                spawnParticles(hero.x + 14, hero.y + 20, "#c084fc", 25);
-            }
         }
 
         function castSpell() {
-            // Si el hechizo es de proyectil (2: Glacius, 3: Grapa, 4: Anillo)
-            if (activeSpell === 1 || activeSpell === 5) return;
-
+            // TODOS los hechizos (1 al 5) se disparan con la varita apuntando al cursor
             const speed = 12;
             const originX = hero.x + (hero.facingRight ? hero.width + 4 : -4);
             const originY = hero.y + 18;
@@ -357,10 +343,12 @@
                 vx: Math.cos(hero.aimAngle) * speed,
                 vy: Math.sin(hero.aimAngle) * speed,
                 type: activeSpell,
-                life: 75
+                life: 80
             });
 
-            spawnParticles(originX, originY, activeSpell === 2 ? '#38bdf8' : (activeSpell === 3 ? '#eab308' : '#f97316'), 8);
+            // Colores por hechizo: 1: Dorado (IBP), 2: Celeste (Adrenalina), 3: Plateado (Clip), 4: Naranja (Banda), 5: Púrpura (Terlipresina)
+            const colors = { 1: '#fde047', 2: '#38bdf8', 3: '#cbd5e1', 4: '#f97316', 5: '#c084fc' };
+            spawnParticles(originX, originY, colors[activeSpell] || '#fff', 8);
         }
 
         function buildLevel() {
@@ -578,9 +566,24 @@
                 // Impacto con esbirros de pepsina
                 minions.forEach((m, mIdx) => {
                     if (p.x > m.x && p.x < m.x + m.w && p.y > m.y && p.y < m.y + m.h) {
-                        spawnParticles(m.x + m.w/2, m.y + m.h/2, '#10b981', 15);
-                        spawnFloatText(m.x, m.y - 15, "¡ESBIRRO ELIMINADO!", "#34d399");
-                        minions.splice(mIdx, 1);
+                        // COHERENCIA FISIOPATOLÓGICA:
+                        // La pepsina SOLO se destruye/inactiva con ALCALIUM [1] (IBP elevando pH > 6.0)
+                        if (p.type === 1) { // ALCALIUM / IBP
+                            spawnParticles(m.x + m.w/2, m.y + m.h/2, '#fde047', 22);
+                            spawnFloatText(m.x, m.y - 15, "¡PEPSINA INACTIVADA! (pH > 6.0)", "#34d399");
+                            minions.splice(mIdx, 1);
+                            bioState.ph = Math.min(7.0, bioState.ph + 1.6);
+                        } else if (p.type === 2) { // Glacius / Adrenalina
+                            spawnParticles(m.x + m.w/2, m.y + m.h/2, '#38bdf8', 8);
+                            spawnFloatText(m.x, m.y - 15, "¡INEFECTIVO! La pepsina sigue activa en frío", "#38bdf8");
+                            m.vx *= 0.5; // Solo la ralentiza
+                        } else if (p.type === 3) { // Grapa / Clip
+                            spawnParticles(m.x + m.w/2, m.y + m.h/2, '#ef4444', 8);
+                            spawnFloatText(m.x, m.y - 15, "¡REBOTE! No puedes grapar una enzima líquida. Usa [1] ALCALIUM", "#f87171");
+                        } else {
+                            spawnParticles(m.x + m.w/2, m.y + m.h/2, '#94a3b8', 6);
+                            spawnFloatText(m.x, m.y - 15, "Inmune. Requiere [1] ALCALIUM", "#94a3b8");
+                        }
                         p.life = 0;
                     }
                 });
@@ -626,6 +629,13 @@
         function handleBossSpellHit(boss, spellType) {
             // CASO 1: TITÁN ÚLCERA PÉPTICA
             if (boss.type === 'ulcer') {
+                if (spellType === 1) { // Alcalium / IBP
+                    bioState.ph = 6.8;
+                    spawnFloatText(boss.x, boss.y - 25, "¡PH NEUTRALIZADO A 6.8! Pepsina inhibida, coágulo protegido", "#fde047");
+                    spawnParticles(boss.x + 35, boss.y + 40, '#fde047', 25);
+                    return;
+                }
+
                 if (spellType === 2) { // Glacius / Adrenalina
                     boss.frozen = true;
                     boss.frozenTimer = 300; // 5 segundos congelado
@@ -637,7 +647,7 @@
                 if (spellType === 3) { // Grapa de Titanio / Endoclip
                     // Regla de Oro: Si pH < 6.0, el ácido derrite la grapa
                     if (bioState.ph < 6.0) {
-                        spawnFloatText(boss.x, boss.y - 30, "¡FALLO!: El pH ácido (2.0) disolvió la grapa. ¡Usa Hechizo [1] (Alcalium/IBP) primero!", "#ef4444");
+                        spawnFloatText(boss.x, boss.y - 30, "¡FALLO!: El pH ácido (2.0) disolvió la grapa. ¡Dispara [1] ALCALIUM primero!", "#ef4444");
                         spawnParticles(boss.x + 35, boss.y + 40, '#ef4444', 18);
                         return;
                     }
@@ -656,11 +666,25 @@
 
                 if (spellType === 4) { // Anillo / Banda
                     spawnFloatText(boss.x, boss.y - 25, "¡INEFICAZ! El anillo no puede estrangular un cráter plano", "#fbbf24");
+                    return;
+                }
+
+                if (spellType === 5) { // Runa Bypass / Terlipresina
+                    spawnFloatText(boss.x, boss.y - 25, "¡ERROR! Terlipresina no tiene efecto hemostático en úlcera arterial", "#f87171");
+                    return;
                 }
             }
 
             // CASO 2: TITÁN VÁRICE PORTAL
             if (boss.type === 'varice') {
+                if (spellType === 5) { // Runa Bypass / Terlipresina
+                    bioState.bypassActive = true;
+                    bioState.bypassTime = 400; // ~6.5 segundos
+                    spawnFloatText(boss.x, boss.y - 30, "¡DESCOMPRESIÓN V1! Flujo portal reducido al 40% (Terlipresina)", "#c084fc");
+                    spawnParticles(boss.x + 40, boss.y + 45, '#c084fc', 30);
+                    return;
+                }
+
                 if (spellType === 2) { // Adrenalina en Várice = IATROGENIA
                     spawnFloatText(boss.x, boss.y - 35, "¡DETONACIÓN! El choque criogénico reventó la pared venosa delgada", "#ef4444");
                     spawnParticles(boss.x + 40, boss.y + 45, '#ef4444', 35);
@@ -675,7 +699,7 @@
 
                 if (spellType === 4) { // Anillo Estrangulador / Banda
                     if (!bioState.bypassActive) {
-                        spawnFloatText(boss.x, boss.y - 25, "¡FALLO! La alta tensión portal desprendió el anillo. Activa la Runa Bypass [5] primero.", "#f97316");
+                        spawnFloatText(boss.x, boss.y - 25, "¡FALLO! La alta tensión portal desprendió el anillo. Dispara primero [5] RUNA BYPASS.", "#f97316");
                         return;
                     }
 
@@ -683,6 +707,7 @@
                     boss.banded = true;
                     spawnFloatText(boss.x, boss.y - 30, "¡ESTRANGULACIÓN PERFECTA! Várice ligada con banda elástica", "#34d399");
                     spawnParticles(boss.x + 40, boss.y + 45, '#34d399', 40);
+                    return;
                 }
             }
         }
@@ -834,16 +859,28 @@
             spells.forEach(p => {
                 ctx.save();
                 ctx.translate(p.x, p.y);
-                if (p.type === 2) { // Glacius
+                if (p.type === 1) { // Alcalium (IBP)
+                    ctx.fillStyle = '#fde047';
+                    ctx.shadowColor = '#fde047';
+                    ctx.shadowBlur = 10;
+                    ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.fill();
+                } else if (p.type === 2) { // Glacius (Adrenalina)
                     ctx.fillStyle = '#38bdf8';
+                    ctx.shadowColor = '#38bdf8';
+                    ctx.shadowBlur = 8;
                     ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI * 2); ctx.fill();
-                } else if (p.type === 3) { // Grapa
-                    ctx.fillStyle = '#eab308';
+                } else if (p.type === 3) { // Grapa (Clip)
+                    ctx.fillStyle = '#cbd5e1';
                     ctx.fillRect(-8, -4, 16, 8);
-                } else if (p.type === 4) { // Anillo
+                } else if (p.type === 4) { // Anillo (Banda)
                     ctx.strokeStyle = '#f97316';
                     ctx.lineWidth = 4;
                     ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.stroke();
+                } else if (p.type === 5) { // Runa Bypass (Terlipresina)
+                    ctx.fillStyle = '#c084fc';
+                    ctx.shadowColor = '#c084fc';
+                    ctx.shadowBlur = 10;
+                    ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI * 2); ctx.fill();
                 }
                 ctx.restore();
             });
